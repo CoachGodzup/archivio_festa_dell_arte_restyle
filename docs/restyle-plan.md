@@ -59,11 +59,11 @@ Repo sorgente: `Racconti-di-Gravellona/archivio_festa_dell_arte` (main, 1995–2
 - M4: Accessibilità + performance + Lighthouse.
 - M5: Deploy Pages sul fork (preview) + PR verso upstream.
 
-## 6. Decisioni aperte (da confermare)
+## 6. Decisioni confermate
 
-- Stack stile: Tailwind CLI (build) vs CSS custom (no build)?
-- Deploy preview: branch `gh-pages` sul fork ora, o solo dopo M2?
-- Ambito dati: migrare le trascrizioni (molto testo) in JSON o tenerle in HTML collassabile?
+- **Stack stile:** Tailwind CLI (build) — CSS compilato, no CDN runtime.
+- **Deploy preview:** subito, su branch `gh-pages` del fork, per iterare visivamente.
+- **Trascrizioni AI:** migrarle in `data/edizioni.json` e renderizzarle collassabili, con ricerca full-text.
 
 ## 7. Rischio principale
 
