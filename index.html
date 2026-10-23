@@ -1,1142 +1,376 @@
 <!DOCTYPE html>
-<html lang="it"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Festa dell'Arte di Gravellona Lomellina — locandine e manifesti</title>
-<link rel="stylesheet" href="assets/style.css"/>
-<meta name="description" content="L'archivio ufficioso di tutte le locandine della Festa dell'Arte di Gravellona Lomellina (PV)">
+<html lang="it" class="scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Archivio Storico Festa dell'Arte — Gravellona Lomellina</title>
+<link rel="stylesheet" href="assets/style.restyle.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>body{font-family:'Plus Jakarta Sans',sans-serif;} .font-serif{font-family:'Playfair Display',serif;}</style>
+</head>
+<body class="min-h-screen flex flex-col bg-stonebg text-stone-900">
+<header class="sticky top-0 z-30 bg-white/88 backdrop-blur border-b border-stone-200/80 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row items-center justify-between gap-3">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 rounded-full bg-terracotta-600 text-white flex items-center justify-center font-serif text-xl font-bold shadow-md shadow-terracotta-600/30"><i class="fa-solid fa-landmark text-sm"></i></div>
+      <div>
+        <h1 class="font-serif text-xl sm:text-2xl font-bold tracking-tight leading-tight">Archivio Festa dell'Arte</h1>
+        <p class="text-xs font-semibold text-terracotta-700 tracking-wider uppercase">Gravellona Lomellina — 30 Edizioni (1995–2026)</p>
+      </div>
+    </div>
+    <div class="flex items-center space-x-3 w-full md:w-auto">
+      <div class="relative flex-grow md:w-64">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-xs"></i>
+        <input type="text" id="global-search" oninput="handleSearch()" placeholder="Cerca anno, tema, luogo…" class="w-full pl-9 pr-3 py-1.5 text-sm bg-stone-100 border border-stone-200 rounded-full focus:outline-none focus:ring-2 focus:ring-terracotta-500/50 focus:bg-white transition-all">
+      </div>
+      <button onclick="toggleViewMode()" id="btn-view-toggle" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200 text-xs font-semibold text-stone-700 hover:bg-stone-200 transition-all shrink-0">
+        <i class="fa-solid fa-border-all text-xs"></i><span id="view-toggle-text" class="hidden sm:inline">Vista Griglia</span>
+      </button>
+    </div>
+  </div>
+</header>
+<main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-10">
+  <section class="space-y-4">
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-3xl border border-stone-200/80 shadow-sm">
+      <div>
+        <div class="inline-flex items-center space-x-2 text-terracotta-600 font-bold text-xs uppercase tracking-wider mb-1"><i class="fa-solid fa-clock-rotate-left"></i><span>Esplora l'Archivio Storico (1995 – 2026)</span></div>
+        <h2 class="font-serif text-2xl font-bold text-stone-900">30 Edizioni di Locandine & Manifesti</h2>
+      </div>
+      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1" id="decade-filters"></div>
+    </div>
+    <div class="flex items-center justify-between gap-3 bg-stone-100/80 px-4 py-2.5 rounded-2xl border border-stone-200 text-xs">
+      <span class="font-bold text-stone-600 flex items-center gap-1.5"><i class="fa-solid fa-arrows-left-right text-terracotta-600"></i> Scorri le locandine o salta all'anno:</span>
+      <select id="quick-year-select" onchange="jumpToSelectedYear(this.value)" class="bg-white border border-stone-300 rounded-lg px-2.5 py-1 font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-terracotta-500"></select>
+    </div>
+    <div id="carousel-view-container" class="relative">
+      <div id="posters-carousel" class="flex gap-4 sm:gap-6 overflow-x-auto no-scrollbar py-4 px-1 scroll-smooth snap-x snap-mandatory"></div>
+      <button onclick="scrollCarousel(-320)" class="absolute left-2 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/90 hover:bg-white text-stone-800 flex items-center justify-center shadow-lg border border-stone-200 transition-all z-10" aria-label="Scorri a sinistra"><i class="fa-solid fa-chevron-left text-sm"></i></button>
+      <button onclick="scrollCarousel(320)" class="absolute right-2 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/90 hover:bg-white text-stone-800 flex items-center justify-center shadow-lg border border-stone-200 transition-all z-10" aria-label="Scorri a destra"><i class="fa-solid fa-chevron-right text-sm"></i></button>
+    </div>
+    <div id="grid-view-container" class="hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 py-2"></div>
+    <div id="no-results-msg" class="hidden text-center py-12 bg-white rounded-3xl border border-stone-200 space-y-2">
+      <i class="fa-solid fa-ghost text-3xl text-stone-300"></i>
+      <p class="font-serif text-lg font-bold text-stone-700">Nessuna edizione trovata</p>
+      <p class="text-xs text-stone-500">Prova a cercare un altro anno, tema o luogo.</p>
+    </div>
+  </section>
 
-<!-- Favicons -->
+  <section id="selected-edition-section" class="space-y-8 pt-4">
+    <div class="bg-gradient-to-br from-terracotta-800 via-terracotta-700 to-stone-900 rounded-3xl p-6 sm:p-10 text-white shadow-xl relative overflow-hidden">
+      <div class="absolute right-0 top-0 w-96 h-96 bg-ambergold-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div class="space-y-3 max-w-3xl">
+          <div class="flex items-center space-x-2">
+            <span id="active-edition-number" class="px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-amber-300 text-xs font-bold uppercase tracking-wider border border-white/10">Edizione</span>
+            <span id="active-edition-date" class="text-xs text-stone-300 font-semibold flex items-center gap-1"><i class="fa-regular fa-calendar"></i></span>
+          </div>
+          <h2 id="active-edition-title" class="font-serif text-3xl sm:text-5xl font-black tracking-tight leading-tight"></h2>
+          <p id="active-edition-desc" class="text-stone-200 text-sm sm:text-base leading-relaxed pt-1"></p>
+        </div>
+        <button onclick="openMainPosterLightbox()" class="self-start md:self-auto bg-white/10 hover:bg-white/20 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/20 transition-all flex items-center space-x-3 shrink-0 group">
+          <i class="fa-solid fa-expand text-amber-300 group-hover:scale-110 transition-transform"></i>
+          <div class="text-left">
+            <span class="block text-[10px] uppercase text-stone-300 font-bold tracking-wider">Locandina Ufficiale</span>
+            <span class="text-xs font-bold text-white">Ingrandisci ad Alta Risoluzione</span>
+          </div>
+        </button>
+      </div>
+    </div>
 
-<link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
-<link rel="manifest" href="assets/favicon/site.webmanifest">
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-serif text-2xl font-bold text-stone-900 flex items-center gap-2"><i class="fa-regular fa-images text-terracotta-600"></i> File dell'Edizione</h3>
+        <span class="text-xs text-stone-500">Clicca su un'immagine per aprire il Lightbox</span>
+      </div>
+      <div id="edition-gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+    </div>
 
-<!-- Facebook Meta Tags -->
-<meta property="og:url" content="">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Festa dell'Arte di Gravellona Lomellina — locandine e manifesti">
-<meta property="og:description" content="L'archivio ufficioso di tutte le locandine della Festa dell'Arte di Gravellona Lomellina (PV)">
-<meta property="og:image" content="volantini/1995-01ed-regianini-header.png">
+    <div id="edition-transcription" class="hidden bg-white rounded-3xl p-6 sm:p-8 border border-stone-200 shadow-sm">
+      <details>
+        <summary class="cursor-pointer font-serif text-xl font-bold text-stone-900 flex items-center gap-2"><i class="fa-solid fa-file-lines text-terracotta-600"></i> Trascrizione del testo della locandina</summary>
+        <pre id="transcription-text" class="mt-4 whitespace-pre-wrap text-xs text-stone-700 bg-stone-50 p-4 rounded-2xl border border-stone-200 overflow-x-auto"></pre>
+        <div id="edition-dati" class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs"></div>
+      </details>
+    </div>
 
-<!-- Twitter Meta Tags -->
-<meta name="twitter:card" content="summary_large_image">
-<meta property="twitter:url" content="">
-<meta name="twitter:title" content="Festa dell'Arte di Gravellona Lomellina — locandine e manifesti">
-<meta name="twitter:description" content="L'archivio ufficioso di tutte le locandine della Festa dell'Arte di Gravellona Lomellina (PV)">
-<meta name="twitter:image" content="volantini/1995-01ed-regianini-header.png">
+    <div id="edition-links" class="hidden bg-white rounded-3xl p-6 sm:p-8 border border-stone-200 shadow-sm">
+      <h3 class="font-serif text-xl font-bold text-stone-900 mb-3 flex items-center gap-2"><i class="fa-solid fa-link text-terracotta-600"></i> Link esterni</h3>
+      <ul id="links-list" class="space-y-1 text-sm"></ul>
+    </div>
+  </section>
+</main>
 
-<!-- Meta Tags Generated via https://www.opengraph.io -->
+<footer class="bg-stone-900 text-stone-400 py-10 mt-16 border-t border-stone-800">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left flex flex-col sm:flex-row justify-between items-center gap-6">
+    <div class="space-y-1">
+      <p class="font-serif text-lg font-bold text-stone-200">Archivio Festa dell'Arte Gravellona Lomellina</p>
+      <p class="text-xs text-stone-500">Oltre tre decenni di creatività, mostre, murales e riscoperta dei cortili storici.</p>
+    </div>
+    <div class="flex items-center space-x-4 text-xs text-stone-400">
+      <a href="https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/" target="_blank" rel="noopener" class="hover:text-terracotta-500 transition-colors flex items-center gap-1.5"><i class="fa-solid fa-globe"></i> Sito Ufficiale Racconti di Gravellona</a>
+    </div>
+  </div>
+</footer>
 
-<!-- JSON+LD -->
+<div id="lightbox-modal" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 flex flex-col justify-between p-4 sm:p-6 select-none" tabindex="-1">
+  <div class="flex items-center justify-between text-white z-20">
+    <div class="flex items-center space-x-3">
+      <span id="lightbox-badge" class="px-3 py-1 rounded-full text-xs font-bold uppercase bg-terracotta-600 text-white">File</span>
+      <span id="lightbox-counter" class="text-xs text-stone-400 font-mono">1 / 1</span>
+    </div>
+    <div class="flex items-center space-x-2">
+      <button onclick="zoomOut()" class="p-2 rounded-full hover:bg-white/20 text-white transition-colors" title="Zoom Out"><i class="fa-solid fa-magnifying-glass-minus text-lg"></i></button>
+      <button onclick="resetZoom()" class="p-2 rounded-full hover:bg-white/20 text-white transition-colors text-xs font-bold">100%</button>
+      <button onclick="zoomIn()" class="p-2 rounded-full hover:bg-white/20 text-white transition-colors" title="Zoom In"><i class="fa-solid fa-magnifying-glass-plus text-lg"></i></button>
+      <div class="w-px h-5 bg-white/20 mx-1"></div>
+      <button onclick="closeLightbox()" class="p-2 rounded-full hover:bg-red-500/80 text-white transition-colors" title="Chiudi"><i class="fa-solid fa-xmark text-2xl"></i></button>
+    </div>
+  </div>
+  <div class="relative flex-grow flex items-center justify-center overflow-hidden my-4" id="lightbox-stage">
+    <div id="lightbox-img-wrapper" class="transition-transform duration-150 ease-out zoom-grab" style="transform: translate(0px, 0px) scale(1);">
+      <img id="lightbox-img" src="" alt="Vista Lightbox" class="max-h-[80vh] max-w-[90vw] object-contain shadow-2xl rounded-lg pointer-events-none">
+    </div>
+    <button onclick="prevLightboxSlide()" class="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/30 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all z-20"><i class="fa-solid fa-chevron-left text-xl"></i></button>
+    <button onclick="nextLightboxSlide()" class="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/30 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all z-20"><i class="fa-solid fa-chevron-right text-xl"></i></button>
+  </div>
+  <div class="text-center max-w-2xl mx-auto space-y-1 z-20">
+    <h3 id="lightbox-title" class="font-serif text-lg sm:text-xl font-bold text-white">Titolo</h3>
+    <p id="lightbox-desc" class="text-xs sm:text-sm text-stone-400"></p>
+  </div>
+</div>
 
-<script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    "name": "Archivio Festa dell'Arte — Gravellona Lomellina",
-    "description": "Archivio storico di tutte le edizioni della Festa dell'Arte a Gravellona Lomellina, dal 1995 alle edizioni più recenti, con locandine, manifesti e ricordi.",
-    "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/",
-    "inLanguage": "it",
-    "about": {
-      "@type": "EventSeries",
-      "name": "Festa dell'Arte",
-      "location": {
-        "@type": "Place",
-        "name": "Gravellona Lomellina",
-        "address": {
-          "@type": "PostalAddress",
-          "addressLocality": "Gravellona Lomellina",
-          "addressRegion": "PV",
-          "addressCountry": "IT"
-        }
-      },
-      "organizer": {
-        "@type": "Organization",
-        "name": "Racconti di Gravellona",
-        "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/"
-      }
-    },
-    "mainEntity": {
-      "@type": "ItemList",
-    "itemListElement": [
-    {
-      "@type": "ListItem",
-      "position": 1,
-      "name": "Festa dell'Arte 1995",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed1995"
-    },
-    {
-      "@type": "ListItem",
-      "position": 2,
-      "name": "Festa dell'Arte 1996",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed1996"
-    },
-    {
-      "@type": "ListItem",
-      "position": 3,
-      "name": "Festa dell'Arte 1997",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed1997"
-    },
-    {
-      "@type": "ListItem",
-      "position": 4,
-      "name": "Festa dell'Arte 1998",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed1998"
-    },
-    {
-      "@type": "ListItem",
-      "position": 5,
-      "name": "Festa dell'Arte 1999",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed1999"
-    },
-    {
-      "@type": "ListItem",
-      "position": 6,
-      "name": "Festa dell'Arte 2000",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed2000"
-    },
-    {
-      "@type": "ListItem",
-      "position": 7,
-      "name": "Festa dell'Arte 2001",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed2001"
-    },
-    {
-      "@type": "ListItem",
-      "position": 8,
-      "name": "Festa dell'Arte 2002",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed2002"
-    },
-    {
-      "@type": "ListItem",
-      "position": 9,
-      "name": "Festa dell'Arte 2003",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed2003"
-    },
-    {
-      "@type": "ListItem",
-      "position": 10,
-      "name": "Festa dell'Arte 2004",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed2004"
-    },
-    {
-      "@type": "ListItem",
-      "position": 11,
-      "name": "Festa dell'Arte 2005",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed2005"
-    },
-    {
-      "@type": "ListItem",
-      "position": 12,
-      "name": "Festa dell'Arte 2006",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed2006"
-    },
-    {
-      "@type": "ListItem",
-      "position": 13,
-      "name": "Festa dell'Arte 2007",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed2007"
-    },
-    {
-      "@type": "ListItem",
-      "position": 14,
-      "name": "Festa dell'Arte 2008",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed2008"
-    },
-    {
-      "@type": "ListItem",
-      "position": 15,
-      "name": "Festa dell'Arte 2009",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed2009"
-    },
-    {
-      "@type": "ListItem",
-      "position": 16,
-      "name": "Festa dell'Arte 2010",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed2010"
-    },
-    {
-      "@type": "ListItem",
-      "position": 17,
-      "name": "Festa dell'Arte 2011",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed2011"
-    },
-    {
-      "@type": "ListItem",
-      "position": 18,
-      "name": "Festa dell'Arte 2012",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed2012"
-    },
-    {
-      "@type": "ListItem",
-      "position": 19,
-      "name": "Festa dell'Arte 2013",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed2013"
-    },
-    {
-      "@type": "ListItem",
-      "position": 20,
-      "name": "Festa dell'Arte 2014",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed2014"
-    },
-    {
-      "@type": "ListItem",
-      "position": 21,
-      "name": "Festa dell'Arte 2015",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed2015"
-    },
-    {
-      "@type": "ListItem",
-      "position": 22,
-      "name": "Festa dell'Arte 2016",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed2016"
-    },
-    {
-      "@type": "ListItem",
-      "position": 23,
-      "name": "Festa dell'Arte 2017",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed2017"
-    },
-    {
-      "@type": "ListItem",
-      "position": 24,
-      "name": "Festa dell'Arte 2018",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed2018"
-    },
-    {
-      "@type": "ListItem",
-      "position": 25,
-      "name": "Festa dell'Arte 2019",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed2019"
-    },
-    {
-      "@type": "ListItem",
-      "position": 26,
-      "name": "Festa dell'Arte 2022",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed2022"
-    },
-    {
-      "@type": "ListItem",
-      "position": 27,
-      "name": "Festa dell'Arte 2023",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed2023"
-    },
-    {
-      "@type": "ListItem",
-      "position": 28,
-      "name": "Festa dell'Arte 2024",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed2024"
-    },
-    {
-      "@type": "ListItem",
-      "position": 29,
-      "name": "Festa dell'Arte 2025",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed2025"
-    },
-    {
-      "@type": "ListItem",
-      "position": 30,
-      "name": "Festa dell'Arte 2026",
-      "url": "https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/#ed2026"
-    }
-  ]
+<script>
+let archiveEditions = [];
+let activeEditionYear = null;
+let currentDecadeFilter = 'all';
+let isGridView = false;
+let currentGalleryMedia = [];
+let currentGalleryIndex = 0;
+let lightboxZoomScale = 1;
+let isDragging = false;
+let startX=0,startY=0,currentX=0,currentY=0;
+
+const DECADES = ['all','2020s','2010s','2000s','1990s'];
+
+async function init() {
+  const res = await fetch('data/edizioni.json');
+  archiveEditions = await res.json();
+  // populate year select
+  const sel = document.getElementById('quick-year-select');
+  archiveEditions.forEach(ed => {
+    const opt = document.createElement('option');
+    opt.value = ed.year; opt.textContent = `${ed.year} (${ed.edition}ª ed.)`;
+    sel.appendChild(opt);
+  });
+  // decade filters
+  const df = document.getElementById('decade-filters');
+  DECADES.forEach(d => {
+    const b = document.createElement('button');
+    b.id = 'decade-'+d;
+    b.className = 'decade-btn px-3 py-1.5 rounded-full text-xs font-semibold ' + (d==='all'?'bg-terracotta-600 text-white shadow-sm':'bg-stone-100 text-stone-600 hover:bg-stone-200');
+    b.textContent = d==='all' ? `Tutti (${archiveEditions.length})` : d;
+    b.onclick = () => filterDecade(d);
+    df.appendChild(b);
+  });
+  renderCarouselAndGrid();
+  selectEdition(archiveEditions[0].year);
+  setupLightboxDrag();
+  setupKeyboardNav();
+}
+window.addEventListener('DOMContentLoaded', init);
+
+function filterDecade(decade) {
+  currentDecadeFilter = decade;
+  document.querySelectorAll('.decade-btn').forEach(btn => {
+    btn.classList.remove('bg-terracotta-600','text-white','shadow-sm');
+    btn.classList.add('bg-stone-100','text-stone-600');
+  });
+  const active = document.getElementById('decade-'+decade);
+  if (active) { active.classList.remove('bg-stone-100','text-stone-600'); active.classList.add('bg-terracotta-600','text-white','shadow-sm'); }
+  renderCarouselAndGrid();
+}
+function handleSearch(){ renderCarouselAndGrid(); }
+function renderCarouselAndGrid() {
+  const query = document.getElementById('global-search').value.toLowerCase().trim();
+  const carousel = document.getElementById('posters-carousel');
+  const grid = document.getElementById('grid-view-container');
+  const noRes = document.getElementById('no-results-msg');
+  carousel.innerHTML=''; grid.innerHTML='';
+  const filtered = archiveEditions.filter(item => {
+    const matchesDecade = currentDecadeFilter==='all' || item.decade===currentDecadeFilter;
+    const haystack = [item.year, item.title||'', item.description, item.location||'', (item.transcription||'')].join(' ').toLowerCase();
+    const matchesSearch = query==='' || haystack.includes(query) || item.files.some(f => (f.caption||'').toLowerCase().includes(query));
+    return matchesDecade && matchesSearch;
+  });
+  if (filtered.length===0) {
+    noRes.classList.remove('hidden');
+    document.getElementById('carousel-view-container').classList.add('hidden');
+    grid.classList.add('hidden');
+    return;
   }
+  noRes.classList.add('hidden');
+  if (!isGridView) document.getElementById('carousel-view-container').classList.remove('hidden'); else grid.classList.remove('hidden');
+  filtered.forEach(item => {
+    const isSelected = item.year===activeEditionYear;
+    const card = document.createElement('div');
+    card.className = `flex-shrink-0 w-44 sm:w-56 bg-white rounded-2xl overflow-hidden border-2 cursor-pointer snap-start transition-all ${isSelected?'border-terracotta-600 ring-4 ring-terracotta-500/20 shadow-xl scale-105':'border-stone-200/80 hover:border-stone-400 shadow-sm opacity-90 hover:opacity-100'}`;
+    card.onclick = () => selectEdition(item.year);
+    const img = item.thumb && (item.thumb) ? item.thumb : item.primaryPoster;
+    card.innerHTML = `
+      <div class="relative aspect-[3/4] bg-stone-900 overflow-hidden">
+        <img src="${img}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" alt="Locandina ${item.year}" loading="lazy">
+        <div class="absolute top-2 left-2 bg-black/75 text-amber-300 backdrop-blur-md px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider">${item.year}</div>
+      </div>
+      <div class="p-3 space-y-1">
+        <span class="text-[10px] font-bold text-terracotta-600 uppercase block">${item.edition}ª edizione</span>
+        <h4 class="font-serif text-xs sm:text-sm font-bold text-stone-900 line-clamp-1">${item.title||'Festa dell\'Arte'}</h4>
+        <button class="w-full mt-1.5 text-[11px] font-bold py-1 px-2 rounded-lg ${isSelected?'bg-terracotta-600 text-white':'bg-stone-100 text-stone-700 hover:bg-stone-200'} transition-colors">${isSelected?'Edizione Attiva':'Vedi Dettagli'}</button>
+      </div>`;
+    carousel.appendChild(card);
+    const g = card.cloneNode(true);
+    g.onclick = () => selectEdition(item.year);
+    grid.appendChild(g);
+  });
+}
+function toggleViewMode() {
+  isGridView = !isGridView;
+  const c = document.getElementById('carousel-view-container');
+  const g = document.getElementById('grid-view-container');
+  const t = document.getElementById('view-toggle-text');
+  if (isGridView) { c.classList.add('hidden'); g.classList.remove('hidden'); t.textContent='Vista Carosello'; }
+  else { c.classList.remove('hidden'); g.classList.add('hidden'); t.textContent='Vista Griglia'; }
+  renderCarouselAndGrid();
+}
+function scrollCarousel(a){ document.getElementById('posters-carousel').scrollBy({left:a,behavior:'smooth'}); }
+function jumpToSelectedYear(y){ selectEdition(y); }
+
+function selectEdition(year) {
+  activeEditionYear = year;
+  const ed = archiveEditions.find(e=>e.year===year);
+  if (!ed) return;
+  document.getElementById('quick-year-select').value = year;
+  document.getElementById('active-edition-number').textContent = `${ed.edition}ª edizione`;
+  document.getElementById('active-edition-date').textContent = ed.date || ed.year;
+  document.getElementById('active-edition-title').textContent = ed.title ? `"${ed.title}"` : `Festa dell'Arte ${ed.year}`;
+  document.getElementById('active-edition-desc').textContent = ed.description || '';
+
+  // gallery
+  currentGalleryMedia = ed.files.map((f,i) => ({
+    url: f.url,
+    badge: f.caption || 'File',
+    title: f.caption || `File ${i+1}`,
+    description: f.alt || '',
+  }));
+  const gg = document.getElementById('edition-gallery-grid');
+  gg.innerHTML = '';
+  ed.files.forEach((f, idx) => {
+    const isImg = /\.(jpe?g|png|webp|gif)$/i.test(f.url);
+    const card = document.createElement('div');
+    card.className = 'group relative bg-stone-900 rounded-2xl overflow-hidden aspect-[4/3] cursor-pointer shadow-md hover:shadow-xl transition-all';
+    card.onclick = () => isImg ? openLightboxAt(idx) : window.open(f.url,'_blank');
+    if (isImg) {
+      card.innerHTML = `<img src="${f.url}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-90 group-hover:opacity-100" alt="${f.alt||f.caption||''}" loading="lazy">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-3 flex flex-col justify-between">
+          <span class="self-start bg-terracotta-600/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">${f.caption||'Immagine'}</span>
+          <div><h5 class="font-serif text-sm font-bold text-white line-clamp-1">${f.caption||''}</h5></div>
+        </div>`;
+    } else {
+      card.innerHTML = `<div class="w-full h-full flex flex-col items-center justify-center text-white gap-2"><i class="fa-solid fa-file-pdf text-3xl"></i><span class="text-xs font-bold">${f.caption||'PDF'}</span><span class="text-[10px] text-stone-300">Apri in nuova scheda</span></div>`;
+    }
+    gg.appendChild(card);
+  });
+
+  // transcription
+  const tBox = document.getElementById('edition-transcription');
+  if (ed.transcription) {
+    tBox.classList.remove('hidden');
+    document.getElementById('transcription-text').textContent = ed.transcription;
+    const dati = document.getElementById('edition-dati');
+    dati.innerHTML = '';
+    (ed.dati||[]).forEach(d => {
+      const div = document.createElement('div');
+      div.className = 'bg-stone-50 rounded-xl p-2 border border-stone-200';
+      div.innerHTML = `<span class="font-bold text-terracotta-700">${d.key}:</span> <span class="text-stone-700">${d.value}</span>`;
+      dati.appendChild(div);
+    });
+  } else { tBox.classList.add('hidden'); }
+
+  // external links
+  const lBox = document.getElementById('edition-links');
+  if (ed.externalLinks && ed.externalLinks.length) {
+    lBox.classList.remove('hidden');
+    const ul = document.getElementById('links-list');
+    ul.innerHTML = '';
+    ed.externalLinks.forEach(l => {
+      const li = document.createElement('li');
+      li.innerHTML = `<a href="${l.url}" target="_blank" rel="noopener" class="text-terracotta-600 hover:underline flex items-center gap-1.5"><i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>${l.label}</a>`;
+      ul.appendChild(li);
+    });
+  } else { lBox.classList.add('hidden'); }
+
+  renderCarouselAndGrid();
+  if (window.innerWidth < 768) document.getElementById('selected-edition-section').scrollIntoView({behavior:'smooth'});
+}
+
+function openMainPosterLightbox(){ openLightboxAt(0); }
+function openLightboxAt(index){
+  currentGalleryIndex = index;
+  const modal = document.getElementById('lightbox-modal');
+  modal.classList.remove('hidden');
+  setTimeout(()=>modal.classList.add('opacity-100'),10);
+  updateLightbox();
+}
+function closeLightbox(){
+  const modal = document.getElementById('lightbox-modal');
+  modal.classList.remove('opacity-100');
+  setTimeout(()=>modal.classList.add('hidden'),300);
+}
+function updateLightbox(){
+  const item = currentGalleryMedia[currentGalleryIndex];
+  if (!item) return;
+  document.getElementById('lightbox-img').src = item.url;
+  document.getElementById('lightbox-badge').textContent = item.badge;
+  document.getElementById('lightbox-counter').textContent = `${currentGalleryIndex+1} / ${currentGalleryMedia.length}`;
+  document.getElementById('lightbox-title').textContent = item.title;
+  document.getElementById('lightbox-desc').textContent = item.description;
+  resetZoom();
+}
+function prevLightboxSlide(){ currentGalleryIndex = (currentGalleryIndex-1+currentGalleryMedia.length)%currentGalleryMedia.length; updateLightbox(); }
+function nextLightboxSlide(){ currentGalleryIndex = (currentGalleryIndex+1)%currentGalleryMedia.length; updateLightbox(); }
+
+function applyTransform(){ document.getElementById('lightbox-img-wrapper').style.transform = `translate(${currentX}px,${currentY}px) scale(${lightboxZoomScale})`; }
+function zoomIn(){ if (lightboxZoomScale<3.5){ lightboxZoomScale+=0.4; applyTransform(); } }
+function zoomOut(){ if (lightboxZoomScale>0.8){ lightboxZoomScale-=0.3; if (lightboxZoomScale<=1){currentX=0;currentY=0;} applyTransform(); } }
+function resetZoom(){ lightboxZoomScale=1; currentX=0; currentY=0; applyTransform(); }
+function setupLightboxDrag(){
+  const wrapper = document.getElementById('lightbox-img-wrapper');
+  const stage = document.getElementById('lightbox-stage');
+  stage.addEventListener('mousedown', e => {
+    if (lightboxZoomScale<=1) return;
+    isDragging=true; startX=e.clientX-currentX; startY=e.clientY-currentY;
+    wrapper.classList.remove('zoom-grab'); wrapper.classList.add('zoom-grabbing');
+  });
+  window.addEventListener('mousemove', e => {
+    if (!isDragging) return; e.preventDefault();
+    currentX=e.clientX-startX; currentY=e.clientY-startY; applyTransform();
+  });
+  window.addEventListener('mouseup', () => { isDragging=false; wrapper.classList.remove('zoom-grabbing'); wrapper.classList.add('zoom-grab'); });
+}
+function setupKeyboardNav(){
+  window.addEventListener('keydown', e => {
+    const modal = document.getElementById('lightbox-modal');
+    const open = !modal.classList.contains('hidden');
+    if (!open) return;
+    if (e.key==='Escape') closeLightbox();
+    if (e.key==='ArrowLeft') prevLightboxSlide();
+    if (e.key==='ArrowRight') nextLightboxSlide();
+    if (e.key==='+'||e.key==='=') zoomIn();
+    if (e.key==='-') zoomOut();
+  });
 }
 </script>
-
-</head><body>
-<h1>Festa dell'Arte — Gravellona Lomellina</h1>
-<div class='carosello'>
-<div class='finestra'>
-<div class='pista'>
-<div class='blocco' aria-hidden='true'>
-<figure><a title='Vai all&apos;edizione 1995' data-vai='#ed1995' href='volantini/1995-01ed-locandina-hd.jpg'><img src='thumb/1995-01ed-locandina-hd.webp' width='246' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 1996' data-vai='#ed1996' href='volantini/1996-02ed-locandina-hd.jpg'><img src='thumb/1996-02ed-locandina-hd.webp' width='244' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 1997' data-vai='#ed1997' href='volantini/1997-03ed-locandina-hd.jpg'><img src='thumb/1997-03ed-locandina-hd.webp' width='250' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 1998' data-vai='#ed1998' href='volantini/1998-04ed-locandina-hd.jpg'><img src='thumb/1998-04ed-locandina-hd.webp' width='250' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 1999' data-vai='#ed1999' href='volantini/1999-05ed-locandina-hd.jpg'><img src='thumb/1999-05ed-locandina-hd.webp' width='251' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2000' data-vai='#ed2000' href='volantini/2000-06ed-locandina-hd.jpg'><img src='thumb/2000-06ed-locandina-hd.webp' width='253' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2001' data-vai='#ed2001' href='volantini/2001-07ed-locandina-hd.jpg'><img src='thumb/2001-07ed-locandina-hd.webp' width='248' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2002' data-vai='#ed2002' href='volantini/2002-08ed-locandina-hd.jpg'><img src='thumb/2002-08ed-locandina-hd.webp' width='207' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2003' data-vai='#ed2003' href='volantini/2003-09ed-locandina-hd.jpg'><img src='thumb/2003-09ed-locandina-hd.webp' width='246' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2004' data-vai='#ed2004' href='volantini/2004-10ed-locandina-hd.jpg'><img src='thumb/2004-10ed-locandina-hd.webp' width='233' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2005' data-vai='#ed2005' href='volantini/2005-11ed-locandina-video.jpg'><img src='thumb/2005-11ed-locandina-video.webp' width='302' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2006' data-vai='#ed2006' href='volantini/2006-12ed-locandina-hd.jpg'><img src='thumb/2006-12ed-locandina-hd.webp' width='247' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2007' data-vai='#ed2007' href='volantini/2007-13ed-locandina-hd.png'><img src='thumb/2007-13ed-locandina-video.webp' width='230' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2008' data-vai='#ed2008' href='volantini/2008-14ed-manifesto-pagina1-copertina.jpg'><img src='thumb/2008-14ed-manifesto-pagina1-copertina.webp' width='248' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2009' data-vai='#ed2009' href='volantini/2009-15ed-manifesto-hd.jpg'><img src='thumb/2009-15ed-manifesto-hd.webp' width='251' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2010' data-vai='#ed2010' href='volantini/2010-16ed-locandina-hd.jpg'><img src='thumb/2010-16ed-locandina-hd.webp' width='239' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2011' data-vai='#ed2011' href='volantini/2011-17ed-locandina-copertina.jpg'><img src='thumb/2011-17ed-locandina-copertina.webp' width='233' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2012' data-vai='#ed2012' href='volantini/2012-18ed-locandina-tema.jpg'><img src='thumb/2012-18ed-locandina-tema.webp' width='249' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2013' data-vai='#ed2013' href='volantini/2013-19ed-locandina.jpg'><img src='thumb/2013-19ed-locandina.webp' width='237' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2014' data-vai='#ed2014' href='volantini/2014-20ed-locandina-hd.jpg'><img src='thumb/2014-20ed-locandina-hd.webp' width='243' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2015' data-vai='#ed2015' href='volantini/2015-21ed-manifesto-hd.jpg'><img src='thumb/2015-21ed-manifesto-hd.webp' width='240' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2016' data-vai='#ed2016' href='volantini/2016-22ed-locandina-full.jpg'><img src='thumb/2016-22ed-locandina-full.webp' width='236' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2017' data-vai='#ed2017' href='volantini/2017-23ed-cda03.jpg'><img src='thumb/2017-23ed-cda03.webp' width='240' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2018' data-vai='#ed2018' href='volantini/2018-24ed-locandina.jpg'><img src='thumb/2018-24ed-locandina.webp' width='237' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2019' data-vai='#ed2019' href='volantini/2019-25ed-volantino-aperto.jpg'><img src='thumb/2019-25ed-volantino-aperto.webp' width='468' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2022' data-vai='#ed2022' href='volantini/2022-26ed-festa-arte.jpg'><img src='thumb/2022-26ed-festa-arte.webp' width='246' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2023' data-vai='#ed2023' href='volantini/2023-27ed-locandina-hd.jpg'><img src='thumb/2023-27ed-locandina-hd.webp' width='234' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2024' data-vai='#ed2024' href='volantini/2024-28ed-gatti-manifesto2.jpg'><img src='thumb/2024-28ed-gatti-manifesto2.webp' width='243' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2025' data-vai='#ed2025' href='volantini/2025-29ed-volantino-copertina.jpg'><img src='thumb/2025-29ed-volantino-copertina.webp' width='241' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2026' data-vai='#ed2026' href='volantini/2026-30ed-manifesto.jpg'><img src='thumb/2026-30ed-manifesto.webp' width='227' height='340' alt=''></a></figure>
-</div>
-<div class='blocco'>
-<figure><a data-vai='#ed1995' href='volantini/1995-01ed-locandina-hd.jpg' title='Vai all&apos;edizione 1995'><img src='thumb/1995-01ed-locandina-hd.webp' width='246' height='340' alt='Locandina della Festa dell&apos;Arte 1995'></a></figure>
-<figure><a data-vai='#ed1996' href='volantini/1996-02ed-locandina-hd.jpg' title='Vai all&apos;edizione 1996'><img src='thumb/1996-02ed-locandina-hd.webp' width='244' height='340' alt='Locandina della Festa dell&apos;Arte 1996'></a></figure>
-<figure><a data-vai='#ed1997' href='volantini/1997-03ed-locandina-hd.jpg' title='Vai all&apos;edizione 1997'><img src='thumb/1997-03ed-locandina-hd.webp' width='250' height='340' alt='Locandina della Festa dell&apos;Arte 1997'></a></figure>
-<figure><a data-vai='#ed1998' href='volantini/1998-04ed-locandina-hd.jpg' title='Vai all&apos;edizione 1998'><img src='thumb/1998-04ed-locandina-hd.webp' width='250' height='340' alt='Locandina della Festa dell&apos;Arte 1998'></a></figure>
-<figure><a data-vai='#ed1999' href='volantini/1999-05ed-locandina-hd.jpg' title='Vai all&apos;edizione 1999'><img src='thumb/1999-05ed-locandina-hd.webp' width='251' height='340' alt='Locandina della Festa dell&apos;Arte 1999'></a></figure>
-<figure><a data-vai='#ed2000' href='volantini/2000-06ed-locandina-hd.jpg' title='Vai all&apos;edizione 2000'><img src='thumb/2000-06ed-locandina-hd.webp' width='253' height='340' alt='Locandina della Festa dell&apos;Arte 2000'></a></figure>
-<figure><a data-vai='#ed2001' href='volantini/2001-07ed-locandina-hd.jpg' title='Vai all&apos;edizione 2001'><img src='thumb/2001-07ed-locandina-hd.webp' width='248' height='340' alt='Locandina della Festa dell&apos;Arte 2001'></a></figure>
-<figure><a data-vai='#ed2002' href='volantini/2002-08ed-locandina-hd.jpg' title='Vai all&apos;edizione 2002'><img src='thumb/2002-08ed-locandina-hd.webp' width='207' height='340' alt='Locandina della Festa dell&apos;Arte 2002'></a></figure>
-<figure><a data-vai='#ed2003' href='volantini/2003-09ed-locandina-hd.jpg' title='Vai all&apos;edizione 2003'><img src='thumb/2003-09ed-locandina-hd.webp' width='246' height='340' alt='Locandina della Festa dell&apos;Arte 2003'></a></figure>
-<figure><a data-vai='#ed2004' href='volantini/2004-10ed-locandina-hd.jpg' title='Vai all&apos;edizione 2004'><img src='thumb/2004-10ed-locandina-hd.webp' width='233' height='340' alt='Locandina della Festa dell&apos;Arte 2004'></a></figure>
-<figure><a data-vai='#ed2005' href='volantini/2005-11ed-locandina-video.jpg' title='Vai all&apos;edizione 2005'><img src='thumb/2005-11ed-locandina-video.webp' width='302' height='340' alt='Locandina della Festa dell&apos;Arte 2005'></a></figure>
-<figure><a data-vai='#ed2006' href='volantini/2006-12ed-locandina-hd.jpg' title='Vai all&apos;edizione 2006'><img src='thumb/2006-12ed-locandina-hd.webp' width='247' height='340' alt='Locandina della Festa dell&apos;Arte 2006'></a></figure>
-<figure><a data-vai='#ed2007' href='volantini/2007-13ed-locandina-video.jpg' title='Vai all&apos;edizione 2007'><img src='thumb/2007-13ed-locandina-video.webp' width='230' height='340' alt='Locandina della Festa dell&apos;Arte 2007'></a></figure>
-<figure><a data-vai='#ed2008' href='volantini/2008-14ed-manifesto-pagina1-copertina.jpg' title='Vai all&apos;edizione 2008'><img src='thumb/2008-14ed-manifesto-pagina1-copertina.webp' width='248' height='340' alt='Locandina della Festa dell&apos;Arte 2008'></a></figure>
-<figure><a data-vai='#ed2009' href='volantini/2009-15ed-manifesto-hd.jpg' title='Vai all&apos;edizione 2009'><img src='thumb/2009-15ed-manifesto-hd.webp' width='251' height='340' alt='Locandina della Festa dell&apos;Arte 2009'></a></figure>
-<figure><a data-vai='#ed2010' href='volantini/2010-16ed-locandina-hd.jpg' title='Vai all&apos;edizione 2010'><img src='thumb/2010-16ed-locandina-hd.webp' width='239' height='340' alt='Locandina della Festa dell&apos;Arte 2010'></a></figure>
-<figure><a data-vai='#ed2011' href='volantini/2011-17ed-locandina-copertina.jpg' title='Vai all&apos;edizione 2011'><img src='thumb/2011-17ed-locandina-copertina.webp' width='233' height='340' alt='Locandina della Festa dell&apos;Arte 2011'></a></figure>
-<figure><a data-vai='#ed2012' href='volantini/2012-18ed-locandina-tema.jpg' title='Vai all&apos;edizione 2012'><img src='thumb/2012-18ed-locandina-tema.webp' width='249' height='340' alt='Locandina della Festa dell&apos;Arte 2012'></a></figure>
-<figure><a data-vai='#ed2013' href='volantini/2013-19ed-locandina.jpg' title='Vai all&apos;edizione 2013'><img src='thumb/2013-19ed-locandina.webp' width='237' height='340' alt='Locandina della Festa dell&apos;Arte 2013'></a></figure>
-<figure><a data-vai='#ed2014' href='volantini/2014-20ed-locandina-hd.jpg' title='Vai all&apos;edizione 2014'><img src='thumb/2014-20ed-locandina-hd.webp' width='243' height='340' alt='Locandina della Festa dell&apos;Arte 2014'></a></figure>
-<figure><a data-vai='#ed2015' href='volantini/2015-21ed-manifesto-hd.jpg' title='Vai all&apos;edizione 2015'><img src='thumb/2015-21ed-manifesto-hd.webp' width='240' height='340' alt='Locandina della Festa dell&apos;Arte 2015'></a></figure>
-<figure><a data-vai='#ed2016' href='volantini/2016-22ed-locandina-full.jpg' title='Vai all&apos;edizione 2016'><img src='thumb/2016-22ed-locandina-full.webp' width='236' height='340' alt='Locandina della Festa dell&apos;Arte 2016'></a></figure>
-<figure><a data-vai='#ed2017' href='volantini/2017-23ed-cda03.jpg' title='Vai all&apos;edizione 2017'><img src='thumb/2017-23ed-cda03.webp' width='240' height='340' alt='Locandina della Festa dell&apos;Arte 2017'></a></figure>
-<figure><a data-vai='#ed2018' href='volantini/2018-24ed-locandina.jpg' title='Vai all&apos;edizione 2018'><img src='thumb/2018-24ed-locandina.webp' width='237' height='340' alt='Locandina della Festa dell&apos;Arte 2018'></a></figure>
-<figure><a data-vai='#ed2019' href='volantini/2019-25ed-volantino-aperto.jpg' title='Vai all&apos;edizione 2019'><img src='thumb/2019-25ed-volantino-aperto.webp' width='468' height='340' alt='Locandina della Festa dell&apos;Arte 2019'></a></figure>
-<figure><a data-vai='#ed2022' href='volantini/2022-26ed-festa-arte.jpg' title='Vai all&apos;edizione 2022'><img src='thumb/2022-26ed-festa-arte.webp' width='246' height='340' alt='Locandina della Festa dell&apos;Arte 2022'></a></figure>
-<figure><a data-vai='#ed2023' href='volantini/2023-27ed-locandina-hd.jpg' title='Vai all&apos;edizione 2023'><img src='thumb/2023-27ed-locandina-hd.webp' width='234' height='340' alt='Locandina della Festa dell&apos;Arte 2023'></a></figure>
-<figure><a data-vai='#ed2024' href='volantini/2024-28ed-gatti-manifesto2.jpg' title='Vai all&apos;edizione 2024'><img src='thumb/2024-28ed-gatti-manifesto2.webp' width='243' height='340' alt='Locandina della Festa dell&apos;Arte 2024'></a></figure>
-<figure><a data-vai='#ed2025' href='volantini/2025-29ed-volantino-copertina.jpg' title='Vai all&apos;edizione 2025'><img src='thumb/2025-29ed-volantino-copertina.webp' width='241' height='340' alt='Locandina della Festa dell&apos;Arte 2025'></a></figure>
-<figure><a data-vai='#ed2026' href='volantini/2026-30ed-manifesto.jpg' title='Vai all&apos;edizione 2026'><img src='thumb/2026-30ed-manifesto.webp' width='227' height='340' alt='Locandina della Festa dell&apos;Arte 2026'></a></figure>
-</div>
-<div class='blocco' aria-hidden='true'>
-<figure><a title='Vai all&apos;edizione 1995' data-vai='#ed1995' href='volantini/1995-01ed-locandina-hd.jpg'><img src='thumb/1995-01ed-locandina-hd.webp' width='246' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 1996' data-vai='#ed1996' href='volantini/1996-02ed-locandina-hd.jpg'><img src='thumb/1996-02ed-locandina-hd.webp' width='244' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 1997' data-vai='#ed1997' href='volantini/1997-03ed-locandina-hd.jpg'><img src='thumb/1997-03ed-locandina-hd.webp' width='250' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 1998' data-vai='#ed1998' href='volantini/1998-04ed-locandina-hd.jpg'><img src='thumb/1998-04ed-locandina-hd.webp' width='250' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 1999' data-vai='#ed1999' href='volantini/1999-05ed-locandina-hd.jpg'><img src='thumb/1999-05ed-locandina-hd.webp' width='251' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2000' data-vai='#ed2000' href='volantini/2000-06ed-locandina-hd.jpg'><img src='thumb/2000-06ed-locandina-hd.webp' width='253' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2001' data-vai='#ed2001' href='volantini/2001-07ed-locandina-hd.jpg'><img src='thumb/2001-07ed-locandina-hd.webp' width='248' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2002' data-vai='#ed2002' href='volantini/2002-08ed-locandina-hd.jpg'><img src='thumb/2002-08ed-locandina-hd.webp' width='207' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2003' data-vai='#ed2003' href='volantini/2003-09ed-locandina-hd.jpg'><img src='thumb/2003-09ed-locandina-hd.webp' width='246' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2004' data-vai='#ed2004' href='volantini/2004-10ed-locandina-hd.jpg'><img src='thumb/2004-10ed-locandina-hd.webp' width='233' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2005' data-vai='#ed2005' href='volantini/2005-11ed-locandina-video.jpg'><img src='thumb/2005-11ed-locandina-video.webp' width='302' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2006' data-vai='#ed2006' href='volantini/2006-12ed-locandina-hd.jpg'><img src='thumb/2006-12ed-locandina-hd.webp' width='247' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2007' data-vai='#ed2007' href='volantini/2007-13ed-locandina-video.jpg'><img src='thumb/2007-13ed-locandina-video.webp' width='230' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2008' data-vai='#ed2008' href='volantini/2008-14ed-manifesto-pagina1-copertina.jpg'><img src='thumb/2008-14ed-manifesto-pagina1-copertina.webp' width='248' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2009' data-vai='#ed2009' href='volantini/2009-15ed-manifesto-hd.jpg'><img src='thumb/2009-15ed-manifesto-hd.webp' width='251' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2010' data-vai='#ed2010' href='volantini/2010-16ed-locandina-hd.jpg'><img src='thumb/2010-16ed-locandina-hd.webp' width='239' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2011' data-vai='#ed2011' href='volantini/2011-17ed-locandina-copertina.jpg'><img src='thumb/2011-17ed-locandina-copertina.webp' width='233' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2012' data-vai='#ed2012' href='volantini/2012-18ed-locandina-tema.jpg'><img src='thumb/2012-18ed-locandina-tema.webp' width='249' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2013' data-vai='#ed2013' href='volantini/2013-19ed-locandina.jpg'><img src='thumb/2013-19ed-locandina.webp' width='237' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2014' data-vai='#ed2014' href='volantini/2014-20ed-locandina-hd.jpg'><img src='thumb/2014-20ed-locandina-hd.webp' width='243' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2015' data-vai='#ed2015' href='volantini/2015-21ed-manifesto-hd.jpg'><img src='thumb/2015-21ed-manifesto-hd.webp' width='240' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2016' data-vai='#ed2016' href='volantini/2016-22ed-locandina-full.jpg'><img src='thumb/2016-22ed-locandina-full.webp' width='236' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2017' data-vai='#ed2017' href='volantini/2017-23ed-cda03.jpg'><img src='thumb/2017-23ed-cda03.webp' width='240' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2018' data-vai='#ed2018' href='volantini/2018-24ed-locandina.jpg'><img src='thumb/2018-24ed-locandina.webp' width='237' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2019' data-vai='#ed2019' href='volantini/2019-25ed-volantino-aperto.jpg'><img src='thumb/2019-25ed-volantino-aperto.webp' width='468' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2022' data-vai='#ed2022' href='volantini/2022-26ed-festa-arte.jpg'><img src='thumb/2022-26ed-festa-arte.webp' width='246' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2023' data-vai='#ed2023' href='volantini/2023-27ed-locandina-hd.jpg'><img src='thumb/2023-27ed-locandina-hd.webp' width='234' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2024' data-vai='#ed2024' href='volantini/2024-28ed-gatti-manifesto2.jpg'><img src='thumb/2024-28ed-gatti-manifesto2.webp' width='243' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2025' data-vai='#ed2025' href='volantini/2025-29ed-volantino-copertina.jpg'><img src='thumb/2025-29ed-volantino-copertina.webp' width='241' height='340' alt=''></a></figure>
-<figure><a title='Vai all&apos;edizione 2026' data-vai='#ed2026' href='volantini/2026-30ed-manifesto.jpg'><img src='thumb/2026-30ed-manifesto.webp' width='227' height='340' alt=''></a></figure>
-</div>
-</div>
-</div>
-<button class='carobtn caroprev' type='button' aria-label='Scorri indietro nel carosello'>&#9664;</button>
-<button class='carobtn caronext' type='button' aria-label='Scorri avanti nel carosello'>&#9654;</button>
-</div>
-<p class='caroscap'>Le locandine dell&apos;archivio, dall&apos;1ª edizione (1995) alla 30ª (2026), in miniatura: passa il mouse sopra la striscia per fermare lo scorrimento, oppure usa le frecce &#9664; &#9654; per scorrere a mano. Clicca una locandina per andare all&apos;edizione corrispondente. La locandina 2017 &egrave; dal blog Concertodautunno di Mario Mainino &mdash; <strong>cita copyright concertodautunno di Mario Mainino</strong>.</p>
-<p>Le locandine e i manifesti delle edizioni. Le locandine delle edizioni dal 1996 al 2007 e del 2010 sono locandine ricomposte (mosaico dei fotogrammi) dallo <em>storico delle locandine</em> nel video <a href='https://www.youtube.com/watch?v=qxwoVUxzl0Q' target='_blank' rel='noopener'>«FESTA DELL'ARTE Edizione 2012»</a> del canale <a href='https://www.youtube.com/@niktuberto1/videos' target='_blank' rel='noopener'>@niktuberto1</a> (Elisabetta Bevilacqua): qualità bassa, in attesa delle versioni ufficiali. Se hai le locandine ufficiali, mandacele. Sotto ogni locandina ricomposta trovi la <strong>trascrizione del testo</strong> con i dati principali (trascrizione assistita da AI: da verificare sull&#x27;immagine).</p>
-<p class='linkfoto'>Delle prime edizioni restano soprattutto le opere dipinte nel paese: il <strong>Libro d&#x27;arte all&#x27;aperto</strong> — i murales di Gravellona Lomellina — nella galleria fotografica del Comune: <a href='https://www.comune.gravellonalomellina.pv.it/it-it/vivere-il-comune/cosa-vedere/murales-36440-1-4723aaaa83193a5dcff9dbc606bc86b7?immagini#galleria-foto' target='_blank' rel='noopener'>Comune di Gravellona Lomellina</a>.</p>
-<h2 id="ed1995">1995 — Edizione 1 (primissima)</h2>
-<p class='desc'>La primissima Festa dell'Arte, il 17-18 giugno 1995: «Una grande festa a giugno in piazza». Disegno di Regianini con scritta, usato come header dell'archivio; dallo stesso <a href='https://www.youtube.com/watch?v=qxwoVUxzl0Q' target='_blank' rel='noopener'>storico delle locandine</a>; la locandina 1995 «di Gravellona e Barbavara», ricomposta dallo scorcio del video. Immagine restaurata con <strong>Gemini</strong>.</p>
-<div class='gal'>
-<figure><a href='volantini/1995-01ed-locandina-hd.jpg'><img loading='lazy' src='volantini/1995-01ed-locandina-hd.jpg' width='742' height='1024' alt='1995-01ed-locandina-hd.jpg'></a><figcaption>restaurata con Gemini</figcaption></figure>
-<figure><a href='volantini/1995-01ed-regianini-header.png'><img loading='lazy' src='volantini/1995-01ed-regianini-header.png' width='1536' height='1024' alt='1995-01ed-regianini-header.png'></a></figure>
-<figure><a href='volantini/1995-01ed-locandina-video.jpg'><img loading='lazy' src='volantini/1995-01ed-locandina-video.jpg' width='418' height='577' alt='1995-01ed-locandina-video.jpg'></a><figcaption>locandina ricomposta dal video (mosaico dei fotogrammi)</figcaption></figure>
-</div>
-<details class='trascr'>
-<summary>Trascrizione del testo della locandina <em>(assistita da AI: da verificare sull&#x27;immagine)</em></summary>
-<pre>MEDIO EVO:
-San Giorgio combatte contro il drago
-
-XX SECOLO:
-L’uomo libero combatte contro la burocrazia
-
-17-18 giugno 1995
-FESTA DELL’ARTE
-di GRAVELLONA e BARBAVARA
-
-Comune di
-GRAVELLONA LOMELLINA
-(PAVIA)
-
-PROVINCIA DI PAVIA
-
-REGIONE LOMBARDIA
-
-Banca Popolare di Novara
-
-[illeggibile]</pre>
-<ul class='dati'>
-<li><b>edizione (numero ordinale, se leggibile):</b> non compare</li>
-<li><b>anno:</b> 1995</li>
-<li><b>date dell&#x27;evento:</b> 17-18 giugno 1995</li>
-<li><b>luogo:</b> Gravellona e Barbavara, Comune di Gravellona Lomellina (Pavia)</li>
-<li><b>tema o titolo dell&#x27;edizione:</b> MEDIO EVO: San Giorgio combatte contro il drago / XX SECOLO: L’uomo libero combatte contro la burocrazia</li>
-<li><b>enti patrocinanti:</b> Comune di Gravellona Lomellina (Pavia), Provincia di Pavia, Regione Lombardia</li>
-<li><b>sponsor o sostenitori:</b> Banca Popolare di Novara</li>
-<li><b>note:</b> è presente una riga di crediti stampata in verticale lungo il margine destro, ma risulta [illeggibile].</li>
-</ul>
-</details>
-<h2 id="ed1996">1996 — Edizione 2</h2>
-<p class='desc'>8-9 giugno 1996. Locandina ricomposta dallo <a href='https://www.youtube.com/watch?v=qxwoVUxzl0Q' target='_blank' rel='noopener'>storico delle locandine</a> (@niktuberto1). Immagine restaurata con <strong>Gemini</strong>.</p>
-<div class='gal'>
-<figure><a href='volantini/1996-02ed-locandina-hd.jpg'><img loading='lazy' src='volantini/1996-02ed-locandina-hd.jpg' width='736' height='1024' alt='1996-02ed-locandina-hd.jpg'></a><figcaption>restaurata con Gemini</figcaption></figure>
-<figure><a href='volantini/1996-02ed-locandina-video.jpg'><img loading='lazy' src='volantini/1996-02ed-locandina-video.jpg' width='425' height='591' alt='1996-02ed-locandina-video.jpg'></a><figcaption>locandina ricomposta dal video (mosaico dei fotogrammi)</figcaption></figure>
-</div>
-<details class='trascr'>
-<summary>Trascrizione del testo della locandina <em>(assistita da AI: da verificare sull&#x27;immagine)</em></summary>
-<pre>FESTA DELL&#x27;ARTE
-di GRAVELLONA e BARBAVARA
-8-9 giugno 1996
-[illeggibile]
-San Giorgio combatte contro il drago
-XX SECOLO:
-L&#x27;uomo libero combatte contro la burocrazia
-
-[illeggibile]
-Comune di
-GRAVELLONA LOMELLINA
-PROVINCIA
-DI PAVIA
-[illeggibile]
-
-[logo BPN] Banca Popolare di Novara
-
-Libera 96</pre>
-<ul class='dati'>
-<li><b>edizione (numero ordinale, se leggibile):</b> non compare</li>
-<li><b>anno:</b> 1996</li>
-<li><b>date dell&#x27;evento:</b> 8-9 giugno 1996</li>
-<li><b>luogo:</b> Gravellona e Barbavara</li>
-<li><b>tema o titolo dell&#x27;edizione:</b> [illeggibile] San Giorgio combatte contro il drago / XX SECOLO: L&#x27;uomo libero combatte contro la burocrazia</li>
-<li><b>enti patrocinanti:</b> Comune di Gravellona Lomellina, Provincia di Pavia, [illeggibile: Regione Lombardia]</li>
-<li><b>sponsor o sostenitori:</b> Banca Popolare di Novara</li>
-<li><b>note (qualsiasi altra informazione visibile:</b> indirizzi web, contatti, orari, prezzi): firma dell&#x27;illustrazione in basso a destra «Libera 96»</li>
-</ul>
-</details>
-<h2 id="ed1997">1997 — Edizione 3</h2>
-<p class='desc'>3ª edizione, 7-8 giugno 1997; tema «Medio Evo: San Giorgio combatte contro il drago» e «XX Secolo: l'uomo libero incontra la burocrazia e gli altri mostri». Locandina ricomposta dallo <a href='https://www.youtube.com/watch?v=qxwoVUxzl0Q' target='_blank' rel='noopener'>storico delle locandine</a>. Immagine restaurata con <strong>Gemini</strong>.</p>
-<div class='gal'>
-<figure><a href='volantini/1997-03ed-locandina-hd.jpg'><img loading='lazy' src='volantini/1997-03ed-locandina-hd.jpg' width='753' height='1024' alt='1997-03ed-locandina-hd.jpg'></a><figcaption>restaurata con Gemini</figcaption></figure>
-<figure><a href='volantini/1997-03ed-locandina-video.jpg'><img loading='lazy' src='volantini/1997-03ed-locandina-video.jpg' width='415' height='564' alt='1997-03ed-locandina-video.jpg'></a><figcaption>locandina ricomposta dal video (mosaico dei fotogrammi)</figcaption></figure>
-</div>
-<details class='trascr'>
-<summary>Trascrizione del testo della locandina <em>(assistita da AI: da verificare sull&#x27;immagine)</em></summary>
-<pre>FESTA DELL’ARTE
-di GRAVELLONA e BARBAVARA
-7-8 giugno 1997
-3ª edizione
-
-MEDIO EVO:
-San Giorgio combatte contro il drago
-XX SECOLO:
-L’uomo libero incontra la burocrazia e gli altri mostri
-
-[testo verticale a destra: illeggibile]
-
-Comune di
-GRAVELLONA LOMELLINA (PAVIA)
-
-Patrocinio della
-REGIONE LOMBARDIA
-
-L’indirizzo internet della festa dell’arte è: www.seledati.it/gravellona</pre>
-<ul class='dati'>
-<li><b>edizione (numero ordinale, se leggibile):</b> 3ª edizione</li>
-<li><b>anno:</b> 1997</li>
-<li><b>date dell&#x27;evento:</b> 7-8 giugno 1997</li>
-<li><b>luogo:</b> GRAVELLONA e BARBAVARA, Comune di GRAVELLONA LOMELLINA (PAVIA)</li>
-<li><b>tema o titolo dell&#x27;edizione:</b> MEDIO EVO: San Giorgio combatte contro il drago / XX SECOLO: L’uomo libero incontra la burocrazia e gli altri mostri</li>
-<li><b>enti patrocinanti:</b> REGIONE LOMBARDIA (compare inoltre: Comune di GRAVELLONA LOMELLINA (PAVIA))</li>
-<li><b>sponsor o sostenitori:</b> non compare</li>
-<li><b>note (qualsiasi altra informazione visibile:</b> indirizzi web, contatti, orari, prezzi): indirizzo internet: www.seledati.it/gravellona; presenza di una riga di crediti/stampa verticale sul bordo destro ([illeggibile])</li>
-</ul>
-</details>
-<h2 id="ed1998">1998 — Edizione 4</h2>
-<p class='desc'>4ª edizione, 6-7 giugno 1998: sul dosso del Valdarengo, all&#x27;ingresso del paese, viene collocato il dolmen, ricavato dalle pietre della frana che nel 1998 scese su Gravellona Toce (<a href='https://www.gravellonartistica.com/parco-de-3-laghi' target='_blank' rel='noopener'>GravellonArtistica</a>), in seguito spostato al Parco Tre Laghi. Locandina ricomposta dallo <a href='https://www.youtube.com/watch?v=qxwoVUxzl0Q' target='_blank' rel='noopener'>storico delle locandine</a>. Immagine restaurata con <strong>Gemini</strong>.</p>
-<div class='gal'>
-<figure><a href='volantini/1998-04ed-locandina-hd.jpg'><img loading='lazy' src='volantini/1998-04ed-locandina-hd.jpg' width='754' height='1024' alt='1998-04ed-locandina-hd.jpg'></a><figcaption>restaurata con Gemini</figcaption></figure>
-<figure><a href='volantini/1998-04ed-locandina-video.jpg'><img loading='lazy' src='volantini/1998-04ed-locandina-video.jpg' width='428' height='581' alt='1998-04ed-locandina-video.jpg'></a><figcaption>locandina ricomposta dal video (mosaico dei fotogrammi)</figcaption></figure>
-</div>
-<details class='trascr'>
-<summary>Trascrizione del testo della locandina <em>(assistita da AI: da verificare sull&#x27;immagine)</em></summary>
-<pre>FESTA DELL&#x27;ARTE
-di
-GRAVELLONA e BARBAVARA
-
-6-7 giugno 1998        4ª edizione
-
-COMUNE DI
-GRAVELLONA LOMELLINA
-(PAVIA)
-
-PROVINCIA
-DI PAVIA
-
-REGIONE
-LOMBARDIA
-
-[illeggibile]
-
-Internet
-www.comune.gravellona-lomellina.pv.it
-
-Libero 98</pre>
-<ul class='dati'>
-<li><b>edizione (numero ordinale, se leggibile):</b> 4ª edizione</li>
-<li><b>anno:</b> 1998</li>
-<li><b>date dell&#x27;evento:</b> 6-7 giugno 1998</li>
-<li><b>luogo:</b> GRAVELLONA e BARBAVARA (Comune di Gravellona Lomellina, Pavia)</li>
-<li><b>tema o titolo dell&#x27;edizione:</b> non compare</li>
-<li><b>enti patrocinanti:</b> COMUNE DI GRAVELLONA LOMELLINA (PAVIA), PROVINCIA DI PAVIA, REGIONE LOMBARDIA</li>
-<li><b>sponsor o sostenitori:</b> non compare</li>
-<li><b>note (qualsiasi altra informazione visibile:</b> indirizzi web, contatti, orari, prezzi): indirizzo internet indicato in basso a sinistra: «Internet www.comune.gravellona-lomellina.pv.it»; firma dell&#x27;opera in basso a destra: «Libero 98»; testo verticale a margine destro [illeggibile].</li>
-</ul>
-</details>
-<h2 id="ed1999">1999 — Edizione 5</h2>
-<p class='desc'>5ª edizione, 4-5-6 giugno 1999. Locandina ricomposta dallo <a href='https://www.youtube.com/watch?v=qxwoVUxzl0Q' target='_blank' rel='noopener'>storico delle locandine</a>. Immagine restaurata con <strong>Gemini</strong>.</p>
-<div class='gal'>
-<figure><a href='volantini/1999-05ed-locandina-hd.jpg'><img loading='lazy' src='volantini/1999-05ed-locandina-hd.jpg' width='757' height='1024' alt='1999-05ed-locandina-hd.jpg'></a><figcaption>restaurata con Gemini</figcaption></figure>
-<figure><a href='volantini/1999-05ed-locandina-video.jpg'><img loading='lazy' src='volantini/1999-05ed-locandina-video.jpg' width='428' height='579' alt='1999-05ed-locandina-video.jpg'></a><figcaption>locandina ricomposta dal video (mosaico dei fotogrammi)</figcaption></figure>
-</div>
-<details class='trascr'>
-<summary>Trascrizione del testo della locandina <em>(assistita da AI: da verificare sull&#x27;immagine)</em></summary>
-<pre>FESTA DELL&#x27;ARTE
-di
-GRAVELLONA e BARBAVARA
-(PAVIA)
-4-5-6 giugno 1999    5ª edizione
-
-[logo Regione Lombardia] LOMB[illeggibile]
-[logo] PAVIA
-[stemma] GRAVELLONA LOMELLINA
-[illeggibile]
-
-[logo] Enel
-
-Banca Popolare di Novara [logo BPN]
-
-Libero 99
-[testo verticale sul margine destro: illeggibile]</pre>
-<ul class='dati'>
-<li><b>edizione (numero ordinale, se leggibile):</b> 5ª</li>
-<li><b>anno:</b> 1999</li>
-<li><b>date dell&#x27;evento:</b> 4-5-6 giugno 1999</li>
-<li><b>luogo:</b> Gravellona e Barbavara (Pavia)</li>
-<li><b>tema o titolo dell&#x27;edizione:</b> non compare</li>
-<li><b>enti patrocinanti:</b> Regione Lombardia [illeggibile], Provincia di Pavia [deducibile da stemma e scritta &quot;PAVIA&quot;], Comune di Gravellona Lomellina</li>
-<li><b>sponsor o sostenitori:</b> Enel, Banca Popolare di Novara</li>
-<li><b>note (qualsiasi altra informazione visibile:</b> indirizzi web, contatti, orari, prezzi): sotto la dicitura &quot;GRAVELLONA LOMELLINA&quot; compare una riga di testo [illeggibile] (presumibilmente un recapito o indirizzo web); firma dell&#x27;illustrazione in basso a destra «Libero 99»; testo verticale sul margine destro [illeggibile].</li>
-</ul>
-</details>
-<h2 id="ed2000">2000 — Edizione 6</h2>
-<p class='desc'>6ª edizione, 3-4 e 10-11 giugno 2000. Locandina ricomposta dallo <a href='https://www.youtube.com/watch?v=qxwoVUxzl0Q' target='_blank' rel='noopener'>storico delle locandine</a>. Immagine restaurata con <strong>Gemini</strong>.</p>
-<div class='gal'>
-<figure><a href='volantini/2000-06ed-locandina-hd.jpg'><img loading='lazy' src='volantini/2000-06ed-locandina-hd.jpg' width='763' height='1024' alt='2000-06ed-locandina-hd.jpg'></a><figcaption>restaurata con Gemini</figcaption></figure>
-<figure><a href='volantini/2000-06ed-locandina-video.jpg'><img loading='lazy' src='volantini/2000-06ed-locandina-video.jpg' width='420' height='564' alt='2000-06ed-locandina-video.jpg'></a><figcaption>locandina ricomposta dal video (mosaico dei fotogrammi)</figcaption></figure>
-</div>
-<details class='trascr'>
-<summary>Trascrizione del testo della locandina <em>(assistita da AI: da verificare sull&#x27;immagine)</em></summary>
-<pre>FESTA DELL&#x27;ARTE
-di GRAVELLONA e BARBAVARA (PAVIA)
-3-4 * 10-11
-giugno 2000
-6ª edizione
-
-Giunta Comunale
-di Gravellona Lomellina
-
-Patrocinio
-della Provincia di Pavia
-assessorato alla cultura
-
-Patronato
-del Presidente
-della Regione Lombardia
-
-[Lungo il bordo destro verticale: testo illeggibile]
-
----</pre>
-<ul class='dati'>
-<li><b>**edizione (numero ordinale, se leggibile):</b> ** 6ª</li>
-<li><b>**anno:</b> ** 2000</li>
-<li><b>**date dell&#x27;evento:</b> ** 3-4 * 10-11 giugno 2000</li>
-<li><b>**luogo:</b> ** Gravellona e Barbavara (PAVIA)</li>
-<li><b>**tema o titolo dell&#x27;edizione:</b> ** non compare</li>
-<li><b>**enti patrocinanti:</b> ** Giunta Comunale di Gravellona Lomellina; Provincia di Pavia - assessorato alla cultura; Presidente della Regione Lombardia</li>
-<li><b>**sponsor o sostenitori:</b> ** non compare</li>
-<li><b>**note (qualsiasi altra informazione visibile:</b> indirizzi web, contatti, orari, prezzi):** lungo il margine destro è presente una riga di crediti tipografici/grafici orientata verticalmente che risulta [illeggibile].</li>
-</ul>
-</details>
-<h2 id="ed2001">2001 — Edizione 7</h2>
-<p class='desc'>7ª edizione, sabato 2 – domenica 3 e sabato 9 – domenica 10 giugno 2001; convegno «Bellezza Natura Arte come fattori di sviluppo economico». Locandina ricomposta dallo <a href='https://www.youtube.com/watch?v=qxwoVUxzl0Q' target='_blank' rel='noopener'>storico delle locandine</a>. Immagine restaurata con <strong>Gemini</strong>.</p>
-<div class='gal'>
-<figure><a href='volantini/2001-07ed-locandina-hd.jpg'><img loading='lazy' src='volantini/2001-07ed-locandina-hd.jpg' width='747' height='1024' alt='2001-07ed-locandina-hd.jpg'></a><figcaption>restaurata con Gemini</figcaption></figure>
-<figure><a href='volantini/2001-07ed-locandina-video.jpg'><img loading='lazy' src='volantini/2001-07ed-locandina-video.jpg' width='427' height='585' alt='2001-07ed-locandina-video.jpg'></a><figcaption>locandina ricomposta dal video (mosaico dei fotogrammi)</figcaption></figure>
-</div>
-<details class='trascr'>
-<summary>Trascrizione del testo della locandina <em>(assistita da AI: da verificare sull&#x27;immagine)</em></summary>
-<pre>FESTA DELL’ARTE
-di GRAVELLONA e BARBAVARA (PAVIA)
-
-7ª edizione
-
-sabato 2 - domenica 3 * sabato 9 - domenica 10
-giugno 2001
-
-Festa
-dell&#x27;arte
-
-Comune di
-Gravellona
-Lomellina
-
-convegno
-su
-Bellezza Natura Arte
-come fattori di sviluppo economico
-Domenica 10 giugno ore 10.00
-al teatro dell&#x27;oratorio
-
-Provincia
-di
-Pavia
-
-Franco Ratti
-sindaco di Gravellona L.
-Arredare un paese costa poco
-
-Ferdinando Monti
-Assessore all&#x27;Agricoltura e all&#x27;Edilizia di Gravellona L.
-Agricoltura, Ambiente, Edilizia
-
-Dario Invernizzi
-Assessore Provinciale ecologia
-La Provincia nella valorizzazione del territorio
-
-Harry Salamon
-Oasi di Sant&#x27;Alessio: arte e natura
-come promozione turistica
-
-Alberto Massa Saluzzo Tecnico agronomo
-Contributi CEE / Regione per migliorare il paesaggio
-
-Libero Greco Artista progettista
-Esperienza di Gravellona, paese d&#x27;arte</pre>
-<ul class='dati'>
-<li><b>edizione (numero ordinale, se leggibile):</b> 7ª</li>
-<li><b>anno:</b> 2001</li>
-<li><b>date dell&#x27;evento:</b> sabato 2 - domenica 3 * sabato 9 - domenica 10 giugno 2001</li>
-<li><b>luogo:</b> GRAVELLONA e BARBAVARA (PAVIA)</li>
-<li><b>tema o titolo dell&#x27;edizione:</b> non compare</li>
-<li><b>enti patrocinanti:</b> Comune di Gravellona Lomellina, Provincia di Pavia</li>
-<li><b>sponsor o sostenitori:</b> non compare</li>
-<li><b>note (qualsiasi altra informazione visibile:</b> indirizzi web, contatti, orari, prezzi): Convegno su «Bellezza Natura Arte come fattori di sviluppo economico» domenica 10 giugno ore 10.00 al teatro dell&#x27;oratorio. Relatori/interventi indicati: Franco Ratti (sindaco di Gravellona L. - «Arredare un paese costa poco»), Ferdinando Monti (Assessore all&#x27;Agricoltura e all&#x27;Edilizia di Gravellona L. - «Agricoltura, Ambiente, Edilizia»), Dario Invernizzi (Assessore Provinciale ecologia - «La Provincia nella valorizzazione del territorio»), Harry Salamon («Oasi di Sant&#x27;Alessio: arte e natura come promozione turistica»), Alberto Massa Saluzzo (Tecnico agronomo - «Contributi CEE / Regione per migliorare il paesaggio»), Libero Greco (Artista progettista - «Esperienza di Gravellona, paese d&#x27;arte»).</li>
-</ul>
-</details>
-<h2 id="ed2002">2002 — Edizione 8</h2>
-<p class='desc'>8ª edizione, giugno 2002. Locandina ricomposta dallo <a href='https://www.youtube.com/watch?v=qxwoVUxzl0Q' target='_blank' rel='noopener'>storico delle locandine</a>. Immagine restaurata con <strong>Gemini</strong>.</p>
-<div class='gal'>
-<figure><a href='volantini/2002-08ed-locandina-hd.jpg'><img loading='lazy' src='volantini/2002-08ed-locandina-hd.jpg' width='623' height='1024' alt='2002-08ed-locandina-hd.jpg'></a><figcaption>restaurata con Gemini</figcaption></figure>
-<figure><a href='volantini/2002-08ed-locandina-video.jpg'><img loading='lazy' src='volantini/2002-08ed-locandina-video.jpg' width='386' height='634' alt='2002-08ed-locandina-video.jpg'></a><figcaption>locandina ricomposta dal video (mosaico dei fotogrammi)</figcaption></figure>
-</div>
-<details class='trascr'>
-<summary>Trascrizione del testo della locandina <em>(assistita da AI: da verificare sull&#x27;immagine)</em></summary>
-<pre>ESTA DELL’ARTE
-[illeggibile]RAVELLONA e BARBAVARA (PAVIA)
-omenica 2 * sabato 8 - domenica 9
-giugno 2002
-
-[illeggibile]
-[illeggibile]
-
-Regione
-Lombardia
-
-nune.gravellona-lomellina.pv.it
-
----</pre>
-<ul class='dati'>
-<li><b>edizione (numero ordinale, se leggibile):</b> non compare</li>
-<li><b>anno:</b> 2002</li>
-<li><b>date dell&#x27;evento:</b> [d]omenica 2, sabato 8 - domenica 9 giugno 2002</li>
-<li><b>luogo:</b> Gravellona e Barbavara (Pavia)</li>
-<li><b>tema o titolo dell&#x27;edizione:</b> non compare</li>
-<li><b>enti patrocinanti:</b> Regione Lombardia; stemma con dicitura sottostante [illeggibile] (presumibilmente Comune di Gravellona Lomellina)</li>
-<li><b>sponsor o sostenitori:</b> non compare</li>
-<li><b>note (qualsiasi altra informazione visibile:</b> indirizzi web, contatti, orari, prezzi): indirizzo web visibile in basso (tagliato all&#x27;inizio): nune.gravellona-lomellina.pv.it; al centro compare l&#x27;immagine di una figura/personaggio realizzato con rotoballe di paglia, occhiali e fazzoletto in testa.</li>
-</ul>
-</details>
-<h2 id="ed2003">2003 — Edizione 9</h2>
-<p class='desc'>9ª edizione, da sabato 31 maggio a domenica 8 giugno 2003. Locandina ricomposta dallo <a href='https://www.youtube.com/watch?v=qxwoVUxzl0Q' target='_blank' rel='noopener'>storico delle locandine</a>. Immagine restaurata con <strong>Gemini</strong>.</p>
-<div class='gal'>
-<figure><a href='volantini/2003-09ed-locandina-hd.jpg'><img loading='lazy' src='volantini/2003-09ed-locandina-hd.jpg' width='741' height='1024' alt='2003-09ed-locandina-hd.jpg'></a><figcaption>restaurata con Gemini</figcaption></figure>
-<figure><a href='volantini/2003-09ed-locandina-video.jpg'><img loading='lazy' src='volantini/2003-09ed-locandina-video.jpg' width='421' height='582' alt='2003-09ed-locandina-video.jpg'></a><figcaption>locandina ricomposta dal video (mosaico dei fotogrammi)</figcaption></figure>
-</div>
-<details class='trascr'>
-<summary>Trascrizione del testo della locandina <em>(assistita da AI: da verificare sull&#x27;immagine)</em></summary>
-<pre>9ª FESTA DELL&#x27;ARTE
-di GRAVELLONA e BARBAVARA (PAVIA)
-2003
-da sabato 31 maggio [illeggibile] a domenica 8 giugno
-
-Con la partecipazione di:
-PARROCCHIA B.V.M. ASSUNTA e SCUOLA DI MUSICA DI GRAVELLONA
-
-Provincia di Pavia
-Comune di Gravellona Lomellina
-Regione Lombardia
-
----</pre>
-<ul class='dati'>
-<li><b>**edizione (numero ordinale, se leggibile):</b> ** 9ª</li>
-<li><b>**anno:</b> ** 2003</li>
-<li><b>**date dell&#x27;evento:</b> ** da sabato 31 maggio a domenica 8 giugno</li>
-<li><b>**luogo:</b> ** GRAVELLONA e BARBAVARA (PAVIA)</li>
-<li><b>**tema o titolo dell&#x27;edizione:</b> ** non compare</li>
-<li><b>**enti patrocinanti:</b> ** Provincia di Pavia, Comune di Gravellona Lomellina, Regione Lombardia</li>
-<li><b>**sponsor o sostenitori:</b> ** non compare (è indicata la partecipazione di: «PARROCCHIA B.V.M. ASSUNTA e SCUOLA DI MUSICA DI GRAVELLONA»)</li>
-<li><b>**note (qualsiasi altra informazione visibile:</b> indirizzi web, contatti, orari, prezzi):** non compare</li>
-</ul>
-</details>
-<h2 id="ed2004">2004 — Edizione 10</h2>
-<p class='desc'>10ª edizione, sabato 5 – domenica 6 e sabato 12 – domenica 13 giugno 2004. Locandina ricomposta dallo <a href='https://www.youtube.com/watch?v=qxwoVUxzl0Q' target='_blank' rel='noopener'>storico delle locandine</a>. Immagine restaurata con <strong>Gemini</strong>.</p>
-<div class='gal'>
-<figure><a href='volantini/2004-10ed-locandina-hd.jpg'><img loading='lazy' src='volantini/2004-10ed-locandina-hd.jpg' width='703' height='1024' alt='2004-10ed-locandina-hd.jpg'></a><figcaption>restaurata con Gemini</figcaption></figure>
-<figure><a href='volantini/2004-10ed-locandina-video.jpg'><img loading='lazy' src='volantini/2004-10ed-locandina-video.jpg' width='438' height='638' alt='2004-10ed-locandina-video.jpg'></a><figcaption>locandina ricomposta dal video (mosaico dei fotogrammi)</figcaption></figure>
-</div>
-<details class='trascr'>
-<summary>Trascrizione del testo della locandina <em>(assistita da AI: da verificare sull&#x27;immagine)</em></summary>
-<pre>10ª FESTA DELL&#x27;ARTE
-di GRAVELLONA e BARBAVARA (PAVIA)
-GIUGNO 2004
-
-sabato 5
-domenica 6
-
-sabato 12
-domenica 13
-
-Libero 2004
-
-www.comune.gravellona-lomellina.pv.it
-
----</pre>
-<ul class='dati'>
-<li><b>edizione (numero ordinale, se leggibile):</b> 10ª</li>
-<li><b>anno:</b> 2004</li>
-<li><b>date dell&#x27;evento:</b> sabato 5, domenica 6, sabato 12, domenica 13 GIUGNO 2004</li>
-<li><b>luogo:</b> GRAVELLONA e BARBAVARA (PAVIA)</li>
-<li><b>tema o titolo dell&#x27;edizione:</b> non compare</li>
-<li><b>enti patrocinanti:</b> non compare</li>
-<li><b>sponsor o sostenitori:</b> non compare</li>
-<li><b>note (qualsiasi altra informazione visibile:</b> indirizzi web, contatti, orari, prezzi): indirizzo web www.comune.gravellona-lomellina.pv.it; firma dell&#x27;illustrazione «Libero 2004».</li>
-</ul>
-</details>
-<h2 id="ed2005">2005 — Edizione 11</h2>
-<p class='desc'>11ª edizione, sabato 4 – domenica 5 e sabato 11 – domenica 12 giugno 2005. Locandina ricomposta dallo <a href='https://www.youtube.com/watch?v=qxwoVUxzl0Q' target='_blank' rel='noopener'>storico delle locandine</a>.</p>
-<div class='gal'>
-<figure><a href='volantini/2005-11ed-locandina-video.jpg'><img loading='lazy' src='volantini/2005-11ed-locandina-video.jpg' width='449' height='506' alt='2005-11ed-locandina-video.jpg'></a></figure>
-</div>
-<details class='trascr'>
-<summary>Trascrizione del testo della locandina <em>(assistita da AI: da verificare sull&#x27;immagine)</em></summary>
-<pre>Festa dell&#x27;arte
-[illeggibile]
-GIUGNO 2005
-sabato 4 sabato 11
-domenica 5 domenica 12</pre>
-<ul class='dati'>
-<li><b>edizione (numero ordinale, se leggibile):</b> non compare</li>
-<li><b>anno:</b> 2005</li>
-<li><b>date dell&#x27;evento:</b> sabato 4, domenica 5, sabato 11, domenica 12 GIUGNO 2005</li>
-<li><b>luogo:</b> non compare</li>
-<li><b>tema o titolo dell&#x27;edizione:</b> Festa dell&#x27;arte</li>
-<li><b>enti patrocinanti:</b> non compare</li>
-<li><b>sponsor o sostenitori:</b> non compare</li>
-<li><b>note (qualsiasi altra informazione visibile:</b> indirizzi web, contatti, orari, prezzi): firma dell&#x27;illustratore/trice presente in basso a destra sul blocco di pietra [illeggibile]</li>
-</ul>
-</details>
-<h2 id="ed2006">2006 — Edizione 12</h2>
-<p class='desc'>12ª Festa dell'Arte e dell'Artigianato Creativo, 2-3-4 e 10-11 giugno 2006. Locandina ricomposta dallo <a href='https://www.youtube.com/watch?v=qxwoVUxzl0Q' target='_blank' rel='noopener'>storico delle locandine</a>. Immagine restaurata con <strong>Gemini</strong>.</p>
-<div class='gal'>
-<figure><a href='volantini/2006-12ed-locandina-hd.jpg'><img loading='lazy' src='volantini/2006-12ed-locandina-hd.jpg' width='743' height='1024' alt='2006-12ed-locandina-hd.jpg'></a><figcaption>restaurata con Gemini</figcaption></figure>
-<figure><a href='volantini/2006-12ed-locandina-video.jpg'><img loading='lazy' src='volantini/2006-12ed-locandina-video.jpg' width='478' height='659' alt='2006-12ed-locandina-video.jpg'></a><figcaption>locandina ricomposta dal video (mosaico dei fotogrammi)</figcaption></figure>
-</div>
-<details class='trascr'>
-<summary>Trascrizione del testo della locandina <em>(assistita da AI: da verificare sull&#x27;immagine)</em></summary>
-<pre>12ª FESTA DELL&#x27;ARTE
-E DELL&#x27;ARTIGIANATO CREATIVO
-
-GRAVELLONA LOMELLINA (PAVIA)
-2-3-4 e 10-11 giugno 2006
-
-www.comune.gravellona-lomellina.pv.it
-
----</pre>
-<ul class='dati'>
-<li><b>edizione (numero ordinale, se leggibile):</b> 12ª</li>
-<li><b>anno:</b> 2006</li>
-<li><b>date dell&#x27;evento:</b> 2-3-4 e 10-11 giugno 2006</li>
-<li><b>luogo:</b> GRAVELLONA LOMELLINA (PAVIA)</li>
-<li><b>tema o titolo dell&#x27;edizione:</b> non compare (è presente il sottotitolo «E DELL&#x27;ARTIGIANATO CREATIVO»)</li>
-<li><b>enti patrocinanti:</b> non compare</li>
-<li><b>sponsor o sostenitori:</b> non compare</li>
-<li><b>note (qualsiasi altra informazione visibile:</b> indirizzi web, contatti, orari, prezzi): sito web: www.comune.gravellona-lomellina.pv.it</li>
-</ul>
-</details>
-<h2 id="ed2007">2007 — Edizione 13</h2>
-<p class='desc'>13ª edizione, sabato 2 – domenica 3 e sabato 9 – domenica 10 giugno 2007: «il paese dove arte, natura e fantasia crescono ogni anno». Locandina ricomposta dallo <a href='https://www.youtube.com/watch?v=qxwoVUxzl0Q' target='_blank' rel='noopener'>storico delle locandine</a>: è tagliata in alto, dove il numero «13ª» perde la prima cifra.</p>
-<div class='gal'>
-<figure><a href='volantini/2007-13ed-locandina-hd.png'><img loading='lazy' src='volantini/2007-13ed-locandina-hd.png' width='404' height='597' alt='2007-13ed-locandina-hd.png'></a></figure>
-<figure><a href='volantini/2007-13ed-locandina-video.jpg'><img loading='lazy' src='volantini/2007-13ed-locandina-video.jpg' width='404' height='597' alt='2007-13ed-locandina-video.jpg'></a></figure>
-</div>
-<details class='trascr'>
-<summary>Trascrizione del testo della locandina <em>(assistita da AI: da verificare sull&#x27;immagine)</em></summary>
-<pre>13ª FESTA DELL&#x27;ARTE
-GRAVELLONA LOMELLINA
-(PAVIA)
-
-il paese dove arte natura fantasia
-crescono ogni anno
-
-Libero 2007
-
-GIUGNO 2007
-sabato 2 sabato 9
-domenica 3 domenica 10
-
-www.comune.gravellona-lomellina.pv.it
-
----</pre>
-<ul class='dati'>
-<li><b>**edizione (numero ordinale, se leggibile):</b> ** 3ª</li>
-<li><b>**anno:</b> ** 2007</li>
-<li><b>**date dell&#x27;evento:</b> ** sabato 2, domenica 3, sabato 9, domenica 10 giugno 2007</li>
-<li><b>**luogo:</b> ** GRAVELLONA LOMELLINA (PAVIA)</li>
-<li><b>**tema o titolo dell&#x27;edizione:</b> ** il paese dove arte natura fantasia crescono ogni anno</li>
-<li><b>**enti patrocinanti:</b> ** non compare</li>
-<li><b>**sponsor o sostenitori:</b> ** non compare</li>
-<li><b>**note (qualsiasi altra informazione visibile:</b> indirizzi web, contatti, orari, prezzi):**</li>
-<li><b>Sito web:</b> www.comune.gravellona-lomellina.pv.it</li>
-<li><b>Illustrazione al centro raffigurante una pecora con firma/dicitura «Libero 2007»:</b> </li>
-</ul>
-</details>
-<h2 id="ed2008">2008 — Edizione 14</h2>
-<p class='desc'>Manifesto ufficiale della 14ª Festa dell'Arte (31 maggio – 1 e 2 giugno, 7 e 8 giugno 2008) a Gravellona Lomellina, in quattro pagine: copertina, «In piazza», «Parco dei 3 Laghi e Giardino Barbavara» e «Alla sera in piazza». Immagini restaurate con Gemini.</p>
-<div class='gal'>
-<figure><a href='volantini/2008-14ed-manifesto-pagina1-copertina.jpg'><img loading='lazy' src='volantini/2008-14ed-manifesto-pagina1-copertina.jpg' width='880' height='1206' alt='2008-14ed-manifesto-pagina1-copertina.jpg'></a></figure>
-<figure><a href='volantini/2008-14ed-manifesto-pagina2-inpiazza.jpg'><img loading='lazy' src='volantini/2008-14ed-manifesto-pagina2-inpiazza.jpg' width='783' height='1024' alt='2008-14ed-manifesto-pagina2-inpiazza.jpg'></a></figure>
-<figure><a href='volantini/2008-14ed-manifesto-pagina3-parco3laghi.jpg'><img loading='lazy' src='volantini/2008-14ed-manifesto-pagina3-parco3laghi.jpg' width='764' height='1024' alt='2008-14ed-manifesto-pagina3-parco3laghi.jpg'></a></figure>
-<figure><a href='volantini/2008-14ed-manifesto-pagina4-sera.jpg'><img loading='lazy' src='volantini/2008-14ed-manifesto-pagina4-sera.jpg' width='750' height='1024' alt='2008-14ed-manifesto-pagina4-sera.jpg'></a></figure>
-</div>
-<h2 id="ed2009">2009 — Edizione 15</h2>
-<p class='desc'>Sagome di zebre per il paese e secondo Concerto Ambientale in Villa Barbavara. Locandina dal blog Concertodautunno di Mario Mainino.</p>
-<div class='gal'>
-<figure><a href='volantini/2009-15ed-manifesto-hd.jpg'><img loading='lazy' src='volantini/2009-15ed-manifesto-hd.jpg' width='2677' height='3622' alt='2009-15ed-manifesto-hd.jpg'></a></figure>
-<figure><a href='volantini/2009-15ed-cda01.jpg'><img loading='lazy' src='volantini/2009-15ed-cda01.jpg' width='237' height='320' alt='2009-15ed-cda01.jpg'></a></figure>
-</div>
-<h2 id="ed2010">2010 — Edizione 16</h2>
-<p class='desc'>16ª edizione, 29-30 maggio e 1-2 giugno 2010, con festa celtica: al Parco Tre Laghi il dolmen (già sul dosso del Valdarengo dal 1998) e il cromlech. Locandina ricomposta dallo <a href='https://www.youtube.com/watch?v=qxwoVUxzl0Q' target='_blank' rel='noopener'>storico delle locandine</a> (@niktuberto1). Immagine restaurata con <strong>Gemini</strong>.</p>
-<div class='gal'>
-<figure><a href='volantini/2010-16ed-locandina-hd.jpg'><img loading='lazy' src='volantini/2010-16ed-locandina-hd.jpg' width='720' height='1024' alt='2010-16ed-locandina-hd.jpg'></a><figcaption>restaurata con Gemini</figcaption></figure>
-<figure><a href='volantini/2010-16ed-locandina-video.jpg'><img loading='lazy' src='volantini/2010-16ed-locandina-video.jpg' width='504' height='717' alt='2010-16ed-locandina-video.jpg'></a><figcaption>locandina ricomposta dal video (mosaico dei fotogrammi)</figcaption></figure>
-</div>
-<details class='trascr'>
-<summary>Trascrizione del testo della locandina <em>(assistita da AI: da verificare sull&#x27;immagine)</em></summary>
-<pre>16^A FESTA DELL&#x27;ARTE
-A GRAVELLONA LOMELLINA (PAVIA)
-
-dove natura e arte crescono
-
-29 maggio
-30 maggio
-
-con festa
-celtica
-
-1 giugno
-2 giugno
-
-[illeggibile]
-edizione
-2010
-
-www.festadellarte.com
-
----</pre>
-<ul class='dati'>
-<li><b>edizione (numero ordinale, se leggibile):</b> 16ª (indicata come 16^A)</li>
-<li><b>anno:</b> 2010</li>
-<li><b>date dell&#x27;evento:</b> 29 maggio, 30 maggio, 1 giugno, 2 giugno</li>
-<li><b>luogo:</b> Gravellona Lomellina (Pavia)</li>
-<li><b>tema o titolo dell&#x27;edizione:</b> dove natura e arte crescono</li>
-<li><b>enti patrocinanti:</b> non compare (è presente uno stemma comunale, ma la dicitura sottostante è [illeggibile])</li>
-<li><b>sponsor o sostenitori:</b> non compare</li>
-<li><b>note (qualsiasi altra informazione visibile:</b> indirizzi web, contatti, orari, prezzi): sito web: www.festadellarte.com; presenza dell&#x27;indicazione «con festa celtica».</li>
-</ul>
-</details>
-<h2 id="ed2011">2011 — Edizione 17</h2>
-<p class='desc'>17ª Festa dell'Arte con Festa Celtica (1–5 giugno 2011): mongolfiera-elefante di Libero, voli in elicottero, salvataggio in acqua con cani Terranova, raduno Vespa e Concerto Ambientale. La copertina ufficiale è la terza pagina del volantino in tre pagine, qui ritagliata a parte.</p>
-<div class='gal'>
-<figure><a href='volantini/2011-17ed-locandina-copertina.jpg'><img loading='lazy' src='volantini/2011-17ed-locandina-copertina.jpg' width='1666' height='2428' alt='2011-17ed-locandina-copertina.jpg'></a></figure>
-<figure><a href='volantini/2011-17ed-volantino-3pagine.jpg'><img loading='lazy' src='volantini/2011-17ed-volantino-3pagine.jpg' width='5316' height='2482' alt='2011-17ed-volantino-3pagine.jpg'></a></figure>
-</div>
-<h2 id="ed2012">2012 — Edizione 18</h2>
-<p class='desc'>Edizione dell'avvio di Art'è, il libro d'arte all'aperto con le riproduzioni dell'Ottocento. Il 9 giugno, nel cortile del municipio, il concerto «Il valzer: dall'operetta alla canzone… ripensando la Belle Époque» dell'Accademia Quartet: Fabio Baldina al pianoforte, con Daniela Stigliano (soprano) ed Ennio Bellani (tenore). Manifesto firmato «Libero 2012», dal sito di Fabio Baldina (fabiobaldina.com). Le due locandine ufficiali (tema e date) sono ricavate dal video promozionale «PROMO Festa dell'Arte 2012» di NICOLA BIO, in cui scorrono: sono state ricomposte fotogramma per fotogramma; la versione «date» risulta tagliata in basso.</p>
-<div class='gal'>
-<figure><a href='volantini/2012-18ed-locandina-tema.jpg'><img loading='lazy' src='volantini/2012-18ed-locandina-tema.jpg' width='1280' height='1747' alt='2012-18ed-locandina-tema.jpg'></a></figure>
-<figure><a href='volantini/2012-18ed-locandina-date.jpg'><img loading='lazy' src='volantini/2012-18ed-locandina-date.jpg' width='1280' height='1163' alt='2012-18ed-locandina-date.jpg'></a></figure>
-<figure><a href='volantini/2012-18ed-baldina-valzer-operetta.jpg'><img loading='lazy' src='volantini/2012-18ed-baldina-valzer-operetta.jpg' width='870' height='1219' alt='2012-18ed-baldina-valzer-operetta.jpg'></a></figure>
-</div>
-<p class='desc'>Dal <a href='https://gravellonatest.blogspot.com/2012/11/18-festa-dellarte.html' target='_blank' rel='noopener'>blog del Parco dei Tre Laghi</a>, il programma a stampa del 2012: la notte delle anime, la serata Belle Époque, le attività delle domeniche e gli speciali.</p>
-<div class='gal'>
-<figure><a href='volantini/2012-18ed-programma-notte-anime.png'><img loading='lazy' src='volantini/2012-18ed-programma-notte-anime.png' width='423' height='602' alt='2012-18ed-programma-notte-anime.png'></a><figcaption>«La notte delle anime», sabato 2 giugno</figcaption></figure>
-<figure><a href='volantini/2012-18ed-programma-belle-epoque.png'><img loading='lazy' src='volantini/2012-18ed-programma-belle-epoque.png' width='427' height='605' alt='2012-18ed-programma-belle-epoque.png'></a><figcaption>«Belle Époque», sabato 9 giugno</figcaption></figure>
-<figure><a href='volantini/2012-18ed-programma-domeniche.png'><img loading='lazy' src='volantini/2012-18ed-programma-domeniche.png' width='854' height='602' alt='2012-18ed-programma-domeniche.png'></a><figcaption>Domeniche 3 e 10 giugno</figcaption></figure>
-<figure><a href='volantini/2012-18ed-programma-speciali.png'><img loading='lazy' src='volantini/2012-18ed-programma-speciali.png' width='423' height='602' alt='2012-18ed-programma-speciali.png'></a><figcaption>Speciali: voli in elicottero e mongolfiera</figcaption></figure>
-</div>
-<h2 id="ed2013">2013 — Edizione 19</h2>
-<p class='desc'>19ª edizione, 1-2 e 8-9 giugno 2013, con la processione goliardica di San Pessimino. Locandina ufficiale; sotto, il fotogramma dal video <a href='https://www.youtube.com/watch?v=MDVrWE6kzJc' target='_blank' rel='noopener'>«Decennale San Pessimino 2003-2013»</a> (@niktuberto1) da cui era stata ricomposta.</p>
-<div class='gal'>
-<figure><a href='volantini/2013-19ed-locandina.jpg'><img loading='lazy' src='volantini/2013-19ed-locandina.jpg' width='931' height='1336' alt='2013-19ed-locandina.jpg'></a></figure>
-<figure><a href='volantini/2013-19ed-volantino-video.jpg'><img loading='lazy' src='volantini/2013-19ed-volantino-video.jpg' width='609' height='480' alt='2013-19ed-volantino-video.jpg'></a></figure>
-</div>
-<details class='trascr'>
-<summary>Trascrizione del testo della locandina <em>(assistita da AI: da verificare sull&#x27;immagine)</em></summary>
-<pre>Gravellona Lomellina
-19° FESTA DELL’ARTE
-2013
-1 - 2 giugno
-8 - 9 giugno
-W SAN
-PESSIMINO
-
----</pre>
-<ul class='dati'>
-<li><b>edizione (numero ordinale, se leggibile):</b> 19°</li>
-<li><b>anno:</b> 2013</li>
-<li><b>date dell&#x27;evento:</b> 1 - 2 giugno e 8 - 9 giugno</li>
-<li><b>luogo:</b> Gravellona Lomellina</li>
-<li><b>tema o titolo dell&#x27;edizione:</b> non compare</li>
-<li><b>enti patrocinanti:</b> non compare</li>
-<li><b>sponsor o sostenitori:</b> non compare</li>
-<li><b>note (qualsiasi altra informazione visibile:</b> indirizzi web, contatti, orari, prezzi): compare uno striscione con il testo «W SAN PESSIMINO»</li>
-</ul>
-</details>
-<h2 id="ed2014">2014 — Edizione 20</h2>
-<p class='desc'>L&#x27;Art&#x27;è cresce lungo via Marconi e i cartelli di benvenuto di Libero Greco accolgono i visitatori; le serate sono a ritmo di swing e Lindy Hop con i Milanoans. Immagine restaurata con <strong>Gemini</strong>.</p>
-<div class='gal'>
-<figure><a href='volantini/2014-20ed-locandina-hd.jpg'><img loading='lazy' src='volantini/2014-20ed-locandina-hd.jpg' width='731' height='1024' alt='2014-20ed-locandina-hd.jpg'></a><figcaption>restaurata con Gemini</figcaption></figure>
-<figure><a href='volantini/2014-20ed-locandina.jpg'><img loading='lazy' src='volantini/2014-20ed-locandina.jpg' width='279' height='391' alt='2014-20ed-locandina.jpg'></a><figcaption>locandina ufficiale (bassa risoluzione)</figcaption></figure>
-<figure><a href='volantini/2014-20ed-locandina-swing.jpg'><img loading='lazy' src='volantini/2014-20ed-locandina-swing.jpg' width='263' height='371' alt='2014-20ed-locandina-swing.jpg'></a></figure>
-<figure><a href='volantini/2014-20ed-programma-collage.jpg'><img loading='lazy' src='volantini/2014-20ed-programma-collage.jpg' width='4288' height='2848' alt='2014-20ed-programma-collage.jpg'></a></figure>
-</div>
-<h2 id="ed2015">2015 — Edizione 21</h2>
-<p class='desc'>L&#x27;anno degli ombrelli, installazione temporanea sopra le vie del paese. Sul palco lo swing di Paradisum e Sugar Pie &amp; The Candymen, gli ottoni dei Maxentia Brass e il Bubble Football; la sera la Notte delle Anime.</p>
-<div class='gal'>
-<figure><a href='volantini/2015-21ed-manifesto-hd.jpg'><img loading='lazy' src='volantini/2015-21ed-manifesto-hd.jpg' width='1754' height='2480' alt='2015-21ed-manifesto-hd.jpg'></a></figure>
-<figure><a href='volantini/2015-21ed-locandina.png'><img loading='lazy' src='volantini/2015-21ed-locandina.png' width='1736' height='827' alt='2015-21ed-locandina.png'></a></figure>
-</div>
-<h2 id="ed2016">2016 — Edizione 22</h2>
-<p class='desc'>Tornano gli ombrelli, con la mostra di Ko Thea Dallosta, il quindicesimo Concerto Ambientale e la sfilata di Camelia.</p>
-<div class='gal'>
-<figure><a href='volantini/2016-22ed-locandina-full.jpg'><img loading='lazy' src='volantini/2016-22ed-locandina-full.jpg' width='1110' height='1600' alt='2016-22ed-locandina-full.jpg'></a></figure>
-<figure><a href='volantini/2016-22ed-locandina.jpg'><img loading='lazy' src='volantini/2016-22ed-locandina.jpg' width='400' height='572' alt='2016-22ed-locandina.jpg'></a></figure>
-<figure><a href='volantini/2016-22ed-cda01.jpg'><img loading='lazy' src='volantini/2016-22ed-cda01.jpg' width='1110' height='1600' alt='2016-22ed-cda01.jpg'></a></figure>
-<figure><a href='volantini/2016-22ed-cda03.jpg'><img loading='lazy' src='volantini/2016-22ed-cda03.jpg' width='1100' height='1600' alt='2016-22ed-cda03.jpg'></a></figure>
-</div>
-<p class='linkfoto'>Reportage fotografico della 22ª edizione — la festa, il concerto ambientale, la mostra di Ko Thea e la sfilata, con oltre cento immagini del 12 giugno 2016: <a href='https://www.concertodautunno.it/160612-gravellona/160612_gravellona-festa.htm' target='_blank' rel='noopener'>Concertodautunno di Mario Mainino</a>.<br>Le fotografie sono dell&#x27;autore: <strong>cita copyright concertodautunno di Mario Mainino</strong>.</p>
-<h2 id="ed2017">2017 — Edizione 23</h2>
-<p class='desc'>L&#x27;anno della bicicletta, con il grande biciclettone e la pista ciclabile verso Vigevano. Locandina e programma dal blog Concertodautunno di Mario Mainino.</p>
-<div class='gal'>
-<figure><a href='volantini/2017-23ed-cda03.jpg'><img loading='lazy' src='volantini/2017-23ed-cda03.jpg' width='586' height='831' alt='2017-23ed-cda03.jpg'></a></figure>
-<figure><a href='volantini/2017-23ed-cda01.jpg'><img loading='lazy' src='volantini/2017-23ed-cda01.jpg' width='1157' height='828' alt='2017-23ed-cda01.jpg'></a></figure>
-<figure><a href='volantini/2017-23ed-cda02.jpg'><img loading='lazy' src='volantini/2017-23ed-cda02.jpg' width='584' height='832' alt='2017-23ed-cda02.jpg'></a></figure>
-<figure><a href='volantini/2017-23ed-cda04.jpg'><img loading='lazy' src='volantini/2017-23ed-cda04.jpg' width='578' height='819' alt='2017-23ed-cda04.jpg'></a></figure>
-</div>
-<h2 id="ed2018">2018 — Edizione 24</h2>
-<p class='desc'>Edizione medievale, con la presentazione del progetto Monforte della Palude, il borgo altomedievale. In programma anche la Notte delle Anime.</p>
-<div class='gal'>
-<figure><a href='volantini/2018-24ed-locandina.jpg'><img loading='lazy' src='volantini/2018-24ed-locandina.jpg' width='1361' height='1949' alt='2018-24ed-locandina.jpg'></a></figure>
-<figure><a href='volantini/2018-notte-anime-locandina.jpg'><img loading='lazy' src='volantini/2018-notte-anime-locandina.jpg' width='840' height='1120' alt='2018-notte-anime-locandina.jpg'></a></figure>
-</div>
-<h2 id="ed2019">2019 — Edizione 25</h2>
-<p class='desc'>25ª edizione, 1-2 giugno 2019: arte e artigianato tra piazza, cortile del municipio e vicolo Ca&#x27; di Ratt, con la Notte delle Anime il 15 giugno. Volantino, programma e pieghevoli Family Run e Family Bike.</p>
-<div class='gal'>
-<figure><a href='volantini/2019-25ed-volantino-aperto.jpg'><img loading='lazy' src='volantini/2019-25ed-volantino-aperto.jpg' width='1597' height='1159' alt='2019-25ed-volantino-aperto.jpg'></a></figure>
-<figure><a href='volantini/2019-25ed-programma-aperto.jpg'><img loading='lazy' src='volantini/2019-25ed-programma-aperto.jpg' width='1597' height='1133' alt='2019-25ed-programma-aperto.jpg'></a></figure>
-<figure><a href='volantini/2019-25ed-programma-via-matteotti.jpg'><img loading='lazy' src='volantini/2019-25ed-programma-via-matteotti.jpg' width='1197' height='1456' alt='2019-25ed-programma-via-matteotti.jpg'></a></figure>
-<figure><a href='volantini/2019-25ed-programma-parco.jpg'><img loading='lazy' src='volantini/2019-25ed-programma-parco.jpg' width='1197' height='1427' alt='2019-25ed-programma-parco.jpg'></a></figure>
-<figure><a href='volantini/2019-notte-anime.jpg'><img loading='lazy' src='volantini/2019-notte-anime.jpg' width='1197' height='1597' alt='2019-notte-anime.jpg'></a></figure>
-<figure><a href='volantini/2019-family-run.jpg'><img loading='lazy' src='volantini/2019-family-run.jpg' width='1016' height='1469' alt='2019-family-run.jpg'></a></figure>
-<figure><a href='volantini/2019-family-bike.jpg'><img loading='lazy' src='volantini/2019-family-bike.jpg' width='1149' height='1464' alt='2019-family-bike.jpg'></a></figure>
-</div>
-<h2 id="ed2022">2022 — Edizione 26</h2>
-<p class='desc'>Il ritorno in piazza dopo gli anni della pandemia: il Monforte della Palude con la proiezione dell&#x27;incendio e la richiesta ai cittadini se proseguire il progetto (<a href='https://www.informatorevigevanese.it/eventi/2022/05/24/event/il-grande-ritorno-della-festa-dell-arte-553678/' target='_blank' rel='noopener'>Informatore Vigevanese, 24 maggio 2022</a>), e la Notte delle Anime a fare da cornice.</p>
-<div class='gal'>
-<figure><a href='volantini/2022-26ed-festa-arte.jpg'><img loading='lazy' src='volantini/2022-26ed-festa-arte.jpg' width='1723' height='2384' alt='2022-26ed-festa-arte.jpg'></a></figure>
-<figure><a href='volantini/2022-26ed-cda01.jpg'><img loading='lazy' src='volantini/2022-26ed-cda01.jpg' width='1723' height='2384' alt='2022-26ed-cda01.jpg'></a></figure>
-<figure><a href='volantini/2022-26ed-cda02.jpg'><img loading='lazy' src='volantini/2022-26ed-cda02.jpg' width='1670' height='2391' alt='2022-26ed-cda02.jpg'></a></figure>
-<figure><a href='volantini/2022-26ed-programma-provvisorio.jpg'><img loading='lazy' src='volantini/2022-26ed-programma-provvisorio.jpg' width='2000' height='1328' alt='2022-26ed-programma-provvisorio.jpg'></a></figure>
-</div>
-<h2 id="ed2023">2023 — Edizione 27</h2>
-<p class='desc'>Festa al Parco Tre Laghi con il primo Trilagòn, il biathlon con le angurie.</p>
-<div class='gal'>
-<figure><a href='volantini/2023-27ed-locandina-hd.jpg'><img loading='lazy' src='volantini/2023-27ed-locandina-hd.jpg' width='1080' height='1571' alt='2023-27ed-locandina-hd.jpg'></a></figure>
-<figure><a href='volantini/2023-27ed-locandina.jpg'><img loading='lazy' src='volantini/2023-27ed-locandina.jpg' width='507' height='737' alt='2023-27ed-locandina.jpg'></a></figure>
-</div>
-<h2 id="ed2024">2024 — Edizione 28</h2>
-<p class='desc'>L&#x27;anno dei gatti, con i manifesti di Marina che invitano in paese tra cantine, concerti e dj set. Nel cortile del Municipio anche la mostra dei manifesti tedeschi del 1920.</p>
-<div class='gal'>
-<figure><a href='volantini/2024-28ed-gatti-manifesto1.jpg'><img loading='lazy' src='volantini/2024-28ed-gatti-manifesto1.jpg' width='1406' height='1867' alt='2024-28ed-gatti-manifesto1.jpg'></a></figure>
-<figure><a href='volantini/2024-28ed-gatti-manifesto2.jpg'><img loading='lazy' src='volantini/2024-28ed-gatti-manifesto2.jpg' width='625' height='873' alt='2024-28ed-gatti-manifesto2.jpg'></a></figure>
-</div>
-<h2 id="ed2025">2025 — Edizione 29</h2>
-<p class='desc'>Mousiké, l&#x27;arte delle Muse: la mostra «Magia del Reale» di V. Alfieri, la sfilata di Spose e Fiori e tre giorni di concerti (31 maggio-2 giugno). Programma sul <a href='https://www.gravellonartistica.com/festadellars' target='_blank' rel='noopener'>sito ufficiale</a>.</p>
-<div class='gal'>
-<figure><a href='volantini/2025-29ed-manifesto-mousike1.jpg'><img loading='lazy' src='volantini/2025-29ed-manifesto-mousike1.jpg' width='1080' height='1454' alt='2025-29ed-manifesto-mousike1.jpg'></a></figure>
-<figure><a href='volantini/2025-29ed-programma.jpg'><img loading='lazy' src='volantini/2025-29ed-programma.jpg' width='1600' height='751' alt='2025-29ed-programma.jpg'></a></figure>
-<figure><a href='volantini/2025-29ed-inlombardia-programma.jpg'><img loading='lazy' src='volantini/2025-29ed-inlombardia-programma.jpg' width='1600' height='751' alt='2025-29ed-inlombardia-programma.jpg'></a></figure>
-<figure><a href='volantini/2025-29ed-manifesto-mousike2.jpg'><img loading='lazy' src='volantini/2025-29ed-manifesto-mousike2.jpg' width='537' height='1060' alt='2025-29ed-manifesto-mousike2.jpg'></a></figure>
-<figure><a href='volantini/2025-29ed-manifesto-mousike3.png'><img loading='lazy' src='volantini/2025-29ed-manifesto-mousike3.png' width='513' height='712' alt='2025-29ed-manifesto-mousike3.png'></a></figure>
-<figure><a href='volantini/2025-29ed-volantino.pdf'>Volantino (PDF)</a></figure>
-</div>
-<h2 id="ed2026">2026 — Edizione 30</h2>
-<p class='desc'>Edizione speciale (19-20 settembre): inaugurazione del Museo della Bicicletta Luciano Geddo, concerto dei MARPHILL in piazza, «Caccia all&#x27;Arte» in 10 tappe e premiazione dell&#x27;indovinello artistico al Parco dei Tre Laghi. Programma sul <a href='https://www.gravellonartistica.com/festa-dell-arte-2026' target='_blank' rel='noopener'>sito ufficiale</a>.</p>
-<div class='gal'>
-<figure><a href='volantini/2026-30ed-manifesto.jpg'><img loading='lazy' src='volantini/2026-30ed-manifesto.jpg' width='1024' height='1536' alt='2026-30ed-manifesto.jpg'></a></figure>
-<figure><a href='volantini/2026-30ed-marphill.jpg'><img loading='lazy' src='volantini/2026-30ed-marphill.jpg' width='1079' height='1535' alt='2026-30ed-marphill.jpg'></a></figure>
-</div>
-<h2 id="weimar">Mostra collaterale — I manifesti della Repubblica di Weimar</h2>
-<p class='desc'>Esposizione dei manifesti della Repubblica di Weimar, allestita nel cortile del Municipio durante la 28ª edizione (2024) come «manifesti tedeschi del 1920».</p>
-<div class='gal'>
-<figure><a href='volantini/mostra-weimar-manifesti-repubblica.jpg'><img loading='lazy' src='volantini/mostra-weimar-manifesti-repubblica.jpg' width='2014' height='1502' alt='mostra-weimar-manifesti-repubblica.jpg'></a></figure>
-</div>
-<h2 id="fiore-lago">Il Fiore e il Lago — evento collaterale (post a parte)</h2>
-<p class='desc'>Mostra Mercato dei Fiori e del Verde al Parco dei Tre Laghi. Non è la Festa dell'Arte ma evento collegato: 2–3 maggio 2015 e 30 aprile – 1 maggio 2016.</p>
-<div class='gal'>
-<figure><a href='volantini/fiore-lago-2015-mostra-mercato.jpg'><img loading='lazy' src='volantini/fiore-lago-2015-mostra-mercato.jpg' width='723' height='1024' alt='fiore-lago-2015-mostra-mercato.jpg'></a></figure>
-<figure><a href='volantini/fiore-lago-2016-manifesto.pdf'>Manifesto (PDF)</a></figure>
-<figure><a href='volantini/fiore-lago-2016-volantino.pdf'>Volantino (PDF)</a></figure>
-</div>
-<h2 id="parco-tre-laghi">Extra — il Parco dei Tre Laghi</h2>
-<p class='desc'>Depliant ufficiale del Parco dei Tre Laghi (PDF del 2014), in due facciate da tre ante ciascuna. Racconta la storia del parco, le regole, il picnic e gli orari; tra le feste principali cita la Festa dell'Arte e la Notte delle Anime. <a href='volantini/parco-tre-laghi-depliant.pdf'>Scarica il PDF originale</a> (428 KB).</p>
-<figure class='facciata'><a href='volantini/parco-tre-laghi-depliant-p1.jpg'><img loading='lazy' src='volantini/parco-tre-laghi-depliant-p1.jpg' width='2258' height='1075' alt='Depliant del Parco dei Tre Laghi, facciata esterna'></a><figcaption>Facciata esterna: «Gravellona è un paese d'arte», le feste, i contatti e la copertina.</figcaption></figure>
-<figure class='facciata'><a href='volantini/parco-tre-laghi-depliant-p2.jpg'><img loading='lazy' src='volantini/parco-tre-laghi-depliant-p2.jpg' width='2258' height='1075' alt='Depliant del Parco dei Tre Laghi, facciata interna'></a><figcaption>Facciata interna: storia del parco, picnic, orari e regole.</figcaption></figure>
-<button class='tornasu' type='button' aria-label='Torna in cima alla pagina' title='Torna in cima'>&#8593;</button>
-<footer><p>Hai locandine mancanti? Scrivici a <a href="mailto:archivio.festadellarte@outlook.it">archivio.festadellarte@outlook.it</a> (vedi anche CONTRIBUTING nel repo).</p>
-<p>Raccolta documentaristica a cura del progetto di storia locale di Gravellona Lomellina.
-I manifesti restano dei rispettivi autori e organizzatori: uso di studio, verificare i diritti prima di ogni riuso.</p></footer>
-<script>
-(function(){
-  var box=document.querySelector('.carosello'); if(!box) return;
-  var fin=box.querySelector('.finestra'),
-      pista=box.querySelector('.pista'),
-      blocco=pista&&pista.querySelector('.blocco');
-  if(!fin||!blocco) return;
-  var ridotta=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var auto=!ridotta, hover=false, liscio=false, ultimo=0, pos=0;
-  function passo(){ return blocco.offsetWidth||1; }
-  function attivo(){ return auto&&!hover&&!liscio; }
-  /* La striscia e' fatta di tre copie identiche: tengo la vista sulla copia
-     centrale, cosi' c'e' sempre una copia intera di spazio a destra e a
-     sinistra e il carosello gira in tutti e due i versi senza fermarsi. */
-  function centra(){
-    var g=passo(), s=fin.scrollLeft;
-    if(s<g||s>=2*g){ s=g+(((s%g)+g)%g); fin.scrollLeft=s; }
-    pos=s;
-  }
-  function giro(t){
-    if(!ultimo) ultimo=t;
-    var dt=Math.min(100,t-ultimo); ultimo=t;
-    if(attivo()){
-      var g=passo();
-      pos+=dt*0.03;
-      if(pos>=2*g) pos-=g;
-      fin.scrollLeft=Math.round(pos);
-    } else {
-      pos=fin.scrollLeft;
-    }
-    requestAnimationFrame(giro);
-  }
-  function pausa(v,ritardo){
-    if(v){ hover=true; }
-    else if(ritardo){ setTimeout(function(){hover=false;},ritardo); }
-    else { hover=false; }
-  }
-  box.addEventListener('mouseenter',function(){pausa(true);});
-  box.addEventListener('mouseleave',function(){pausa(false);});
-  box.addEventListener('focusin',function(){pausa(true);});
-  box.addEventListener('focusout',function(){pausa(false);});
-  box.addEventListener('touchstart',function(){pausa(true);},{passive:true});
-  box.addEventListener('touchend',function(){pausa(false,1200);},{passive:true});
-  box.addEventListener('touchcancel',function(){pausa(false,1200);},{passive:true});
-  function scorri(segno){
-    liscio=true;
-    centra();
-    fin.scrollBy({left:segno*fin.clientWidth*0.9,behavior:ridotta?'auto':'smooth'});
-    setTimeout(function(){liscio=false;centra();},900);
-  }
-  var p=box.querySelector('.caroprev'), n=box.querySelector('.caronext');
-  if(p) p.addEventListener('click',function(){scorri(-1);});
-  if(n) n.addEventListener('click',function(){scorri(1);});
-  centra();
-  window.addEventListener('load',centra);
-  window.addEventListener('resize',centra);
-  if(auto) requestAnimationFrame(giro);
-})();
-</script>
-<script>
-(function(){
-  var ridotta=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var links=document.querySelectorAll('.carosello a[data-vai]');
-  for(var i=0;i<links.length;i++){
-    links[i].addEventListener('click',function(e){
-      if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button!==0) return;
-      var t=document.querySelector(this.getAttribute('data-vai'));
-      if(!t) return;
-      e.preventDefault();
-      t.scrollIntoView({behavior:ridotta?'auto':'smooth',block:'start'});
-      t.setAttribute('tabindex','-1');
-      t.focus({preventScroll:true});
-      if(history.pushState) history.pushState(null,'',this.getAttribute('data-vai'));
-    });
-  }
-})();
-</script>
-<script>
-(function(){
-  var b=document.querySelector('.tornasu');
-  if(!b) return;
-  var ridotta=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function aggiorna(){
-    if(window.scrollY>600) b.classList.add('visibile');
-    else b.classList.remove('visibile');
-  }
-  b.addEventListener('click',function(){
-    window.scrollTo({top:0,behavior:ridotta?'auto':'smooth'});
-  });
-  window.addEventListener('scroll',aggiorna,{passive:true});
-  window.addEventListener('resize',aggiorna);
-  aggiorna();
-})();
-</script>
-</body></html>
+</body>
+</html>
