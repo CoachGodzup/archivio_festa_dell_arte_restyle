@@ -10,6 +10,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>body{font-family:'Plus Jakarta Sans',sans-serif;} .font-serif{font-family:'Playfair Display',serif;}</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"CollectionPage","name":"Archivio Festa dell'Arte — Gravellona Lomellina","description":"Archivio storico di tutte le edizioni della Festa dell'Arte a Gravellona Lomellina (1995–2026), con locandine, manifesti e trascrizioni.","url":"https://racconti-di-gravellona.github.io/archivio_festa_dell_arte/","inLanguage":"it"}
+</script>
 </head>
 <body class="min-h-screen flex flex-col bg-stonebg text-stone-900">
 <header class="sticky top-0 z-30 bg-white/88 backdrop-blur border-b border-stone-200/80 shadow-sm">
@@ -272,7 +275,7 @@ function selectEdition(year) {
     card.className = 'group relative bg-stone-900 rounded-2xl overflow-hidden aspect-[4/3] cursor-pointer shadow-md hover:shadow-xl transition-all';
     card.onclick = () => isImg ? openLightboxAt(idx) : window.open(f.url,'_blank');
     if (isImg) {
-      card.innerHTML = `<img src="${f.url}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-90 group-hover:opacity-100" alt="${f.alt||f.caption||''}" loading="lazy">
+      card.innerHTML = `<img src="${f.url}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-90 group-hover:opacity-100" alt="${ed.year} — ${f.caption||f.url.split('/').pop()}" loading="lazy">
         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-3 flex flex-col justify-between">
           <span class="self-start bg-terracotta-600/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">${f.caption||'Immagine'}</span>
           <div><h5 class="font-serif text-sm font-bold text-white line-clamp-1">${f.caption||''}</h5></div>
