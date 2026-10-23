@@ -204,9 +204,8 @@ function handleSearch(){ renderCarouselAndGrid(); }
 function renderCarouselAndGrid() {
   const query = document.getElementById('global-search').value.toLowerCase().trim();
   const carousel = document.getElementById('posters-carousel');
-  const grid = document.getElementById('grid-view-container');
   const noRes = document.getElementById('no-results-msg');
-  carousel.innerHTML=''; grid.innerHTML='';
+  carousel.innerHTML='';
   const filtered = archiveEditions.filter(item => {
     const matchesDecade = currentDecadeFilter==='all' || item.decade===currentDecadeFilter;
     const haystack = [item.year, item.title||'', item.description, item.location||'', (item.transcription||'')].join(' ').toLowerCase();
@@ -216,11 +215,10 @@ function renderCarouselAndGrid() {
   if (filtered.length===0) {
     noRes.classList.remove('hidden');
     document.getElementById('carousel-view-container').classList.add('hidden');
-    grid.classList.add('hidden');
     return;
   }
   noRes.classList.add('hidden');
-  if (!isGridView) document.getElementById('carousel-view-container').classList.remove('hidden'); else grid.classList.remove('hidden');
+  document.getElementById('carousel-view-container').classList.remove('hidden');
   filtered.forEach(item => {
     const isSelected = item.year===activeEditionYear;
     const card = document.createElement('div');
@@ -237,9 +235,6 @@ function renderCarouselAndGrid() {
         <h4 class="font-serif text-xs sm:text-sm font-bold text-stone-900 line-clamp-1">${item.title||'Festa dell\'Arte'}</h4>
       </div>`;
     carousel.appendChild(card);
-    const g = card.cloneNode(true);
-    g.onclick = () => selectEdition(item.year);
-    grid.appendChild(g);
   });
 }
 function toggleViewMode() {
