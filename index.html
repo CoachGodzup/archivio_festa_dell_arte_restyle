@@ -88,6 +88,11 @@
       <div id="edition-gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
     </div>
 
+    <div id="edition-context" class="hidden bg-white rounded-3xl p-6 sm:p-8 border border-stone-200 shadow-sm">
+      <h3 class="font-serif text-xl font-bold text-stone-900 mb-2 flex items-center gap-2"><i class="fa-solid fa-landmark text-terracotta-600"></i> Storia dell'edizione</h3>
+      <p id="context-text" class="text-sm text-stone-700 leading-relaxed"></p>
+      <p id="context-sources" class="mt-3 text-xs text-stone-500"></p>
+    </div>
     <div id="edition-transcription" class="hidden bg-white rounded-3xl p-6 sm:p-8 border border-stone-200 shadow-sm">
       <details>
         <summary class="cursor-pointer font-serif text-xl font-bold text-stone-900 flex items-center gap-2"><i class="fa-solid fa-file-lines text-terracotta-600"></i> Trascrizione del testo della locandina</summary>
@@ -284,6 +289,15 @@ function selectEdition(year) {
     }
     gg.appendChild(card);
   });
+
+  // context / storia dell'edizione
+  const cBox = document.getElementById('edition-context');
+  if (ed.context) {
+    cBox.classList.remove('hidden');
+    document.getElementById('context-text').textContent = ed.context;
+    const src = document.getElementById('context-sources');
+    src.innerHTML = 'Fonti: ' + (ed.sources||[]).map(s => `<a href="${s.url}" target="_blank" rel="noopener" class="text-terracotta-600 hover:underline">${s.label}</a>`).join(' · ');
+  } else { cBox.classList.add('hidden'); }
 
   // transcription
   const tBox = document.getElementById('edition-transcription');
