@@ -42,9 +42,6 @@
       </div>
       <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1" id="decade-filters"></div>
     </div>
-    <div class="flex items-center gap-3 bg-stone-100/80 px-4 py-2.5 rounded-2xl border border-stone-200 text-xs">
-      <span class="font-bold text-stone-600 flex items-center gap-1.5"><i class="fa-solid fa-arrows-left-right text-terracotta-600"></i> Scorri le locandine con le frecce o trascinando</span>
-    </div>
     <div id="carousel-view-container" class="relative">
       <div id="posters-carousel" class="flex gap-4 sm:gap-6 overflow-x-auto no-scrollbar py-4 px-1 scroll-smooth snap-x snap-mandatory"></div>
       <button onclick="scrollCarousel(-320)" class="absolute left-2 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/90 hover:bg-white text-stone-800 flex items-center justify-center shadow-lg border border-stone-200 transition-all z-10" aria-label="Scorri a sinistra"><i class="fa-solid fa-chevron-left text-sm"></i></button>
@@ -159,7 +156,6 @@
 let archiveEditions = [];
 let activeEditionYear = null;
 let currentDecadeFilter = 'all';
-let isGridView = false;
 let currentGalleryMedia = [];
 let currentGalleryIndex = 0;
 let lightboxZoomScale = 1;
@@ -171,13 +167,6 @@ const DECADES = ['all','2020s','2010s','2000s','1990s'];
 async function init() {
   const res = await fetch('data/edizioni.json');
   archiveEditions = await res.json();
-  // populate year select
-  const sel = document.getElementById('quick-year-select');
-  archiveEditions.forEach(ed => {
-    const opt = document.createElement('option');
-    opt.value = ed.year; opt.textContent = `${ed.year} (${ed.edition}ª ed.)`;
-    sel.appendChild(opt);
-  });
   // decade filters
   const df = document.getElementById('decade-filters');
   DECADES.forEach(d => {
@@ -242,23 +231,12 @@ function renderCarouselAndGrid() {
     carousel.appendChild(card);
   });
 }
-function toggleViewMode() {
-  isGridView = !isGridView;
-  const c = document.getElementById('carousel-view-container');
-  const g = document.getElementById('grid-view-container');
-  const t = document.getElementById('view-toggle-text');
-  if (isGridView) { c.classList.add('hidden'); g.classList.remove('hidden'); t.textContent='Vista Carosello'; }
-  else { c.classList.remove('hidden'); g.classList.add('hidden'); t.textContent='Vista Griglia'; }
-  renderCarouselAndGrid();
-}
 function scrollCarousel(a){ document.getElementById('posters-carousel').scrollBy({left:a,behavior:'smooth'}); }
-function jumpToSelectedYear(y){ selectEdition(y); }
 
 function selectEdition(year) {
   activeEditionYear = year;
   const ed = archiveEditions.find(e=>e.year===year);
   if (!ed) return;
-  document.getElementById('quick-year-select').value = year;
   document.getElementById('active-edition-number').textContent = `${ed.edition}ª edizione`;
   document.getElementById('active-edition-date').textContent = ed.date || ed.year;
   document.getElementById('active-edition-title').textContent = ed.title ? `"${ed.title}"` : `Festa dell'Arte ${ed.year}`;

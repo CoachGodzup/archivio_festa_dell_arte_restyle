@@ -28,7 +28,8 @@ for (const m of html.matchAll(re)) {
     const href = (inner.match(/<a href='([^']+)'/) || [])[1];
     const caption = (inner.match(/<figcaption>(.*?)<\/figcaption>/s) || [])[1];
     const imgAlt = (inner.match(/alt='([^']*)'/) || [])[1];
-    if (href) files.push({ url: href, caption: caption ? caption.replace(/<[^>]+>/g,'').trim() : null, alt: imgAlt || null });
+    const cap = caption ? caption.replace(/<[^>]+>/g,'').trim() : null;
+    if (href) files.push({ url: href, caption: cap, alt: `${year} — ${cap || (href.split('/').pop())}` });
   }
 
   // transcription (pre inside details)
