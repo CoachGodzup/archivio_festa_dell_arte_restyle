@@ -36,6 +36,12 @@ const contextByYear = {
   2024: "Tema dell'edizione: i gatti.",
   2025: "«Mousiké — l'arte delle muse».",
   2026: "Festa spostata in settembre. Inaugurazione del Museo della Bicicletta Luciano Geddo.",
+  2006: "Inaugurazione del Parco dei Tre Laghi: costruzione di un paesaggio naturale a Gravellona Lomellina.",
+  2008: "Totem di palude con gli animali totemici della nostra terra (zanzara, airone, pesce, rana). Idea Gravellonese, disegno di Libero Greco, 14ª festa dell'Arte.",
+  2010: "Dolmen e Cromlech al Parco dei Tre Laghi; il dolmen era stato installato per la Festa dell'Arte 1998 sul Valdarengo e spostato al parco nella primavera 2010.",
+  2013: "Prima festa de «Il fiore e il lago» e nuova scalinata in granito nel Parco dei Tre Laghi.",
+  2018: "Nuovo progetto di Monforte della Palude: cantiere di costruzione di un villaggio incastellato della seconda metà dell'XI secolo con fattoria medievale (4 obiettivi: archeologia sperimentale, cultura artigianale, ecologia, turismo di qualità).",
+  2019: "Prolungamento del progetto Monforte della Palude; il Gravellona Express diventa spazio pub.",
 };
 
 const SOURCES = [
