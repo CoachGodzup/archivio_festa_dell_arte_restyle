@@ -444,15 +444,20 @@
     "edition": 11,
     "decade": "2000s",
     "title": null,
-    "description": "11ª edizione, sabato 4 – domenica 5 e sabato 11 – domenica 12 giugno 2005. Locandina ricomposta dallo storico delle locandine.",
+    "description": "11ª edizione, sabato 4 – domenica 5 e sabato 11 – domenica 12 giugno 2005. Locandina ricomposta dallo storico delle locandine. Immagine restaurata con Gemini.",
     "date": null,
     "location": null,
-    "primaryPoster": "volantini/2005-11ed-locandina-video.jpg",
-    "thumb": "thumb/2005-11ed-locandina-video.webp",
+    "primaryPoster": "volantini/2005-11ed-locandina-hd.jpg",
+    "thumb": "thumb/2005-11ed-locandina-hd.webp",
     "files": [
       {
+        "url": "volantini/2005-11ed-locandina-hd.jpg",
+        "caption": "restaurata con Gemini",
+        "alt": "2005-11ed-locandina-hd.jpg"
+      },
+      {
         "url": "volantini/2005-11ed-locandina-video.jpg",
-        "caption": null,
+        "caption": "locandina ricomposta dal video (mosaico dei fotogrammi)",
         "alt": "2005-11ed-locandina-video.jpg"
       }
     ],
@@ -1045,7 +1050,7 @@
     "date": null,
     "location": null,
     "primaryPoster": "volantini/2019-25ed-locandina-greco.png",
-    "thumb": "volantini/2019-25ed-locandina-greco.png",
+    "thumb": "thumb/2019-25ed-locandina-greco.webp",
     "files": [
       {
         "url": "volantini/2019-25ed-locandina-greco.png",
